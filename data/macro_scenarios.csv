@@ -1,0 +1,4 @@
+scenario_name,rate_shock_bps,unemployment_delta_pct,hpa_delta_pct,prepayment_multiplier,default_multiplier,delinquency_multiplier,description
+base,0,0.0,0.0,1.0,1.0,1.0,Base case — steady macro environment.
+adverse_credit,150,2.5,-8.0,0.6,2.2,1.8,"Adverse credit stress: rate rise 150bps, unemployment +2.5pp, HPI -8%."
+high_prepayment,-75,-0.5,5.0,2.5,0.75,0.8,"High prepayment: rates drop 75bps, refi boom."

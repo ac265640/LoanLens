@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "description": "Deterministic validation rules for loan panel data quality checks.",
+  "rules": [
+    {
+      "rule_id": "VR001",
+      "name": "date_order_check",
+      "condition": "reporting_month >= origination_month",
+      "severity": "critical",
+      "exception_type": "Date Anomaly"
+    },
+    {
+      "rule_id": "VR002",
+      "name": "paid_off_balance_check",
+      "condition": "current_status == 'Paid Off' \u2192 current_balance <= 1000",
+      "severity": "high",
+      "exception_type": "Balance Inconsistency"
+    },
+    {
+      "rule_id": "VR003",
+      "name": "default_dpd_check",
+      "condition": "current_status == 'Default' \u2192 days_past_due >= 60",
+      "severity": "high",
+      "exception_type": "Data Conflict"
+    },
+    {
+      "rule_id": "VR004",
+      "name": "modification_document_check",
+      "condition": "modification_flag == 1 \u2192 document_status != 'Missing Items'",
+      "severity": "medium",
+      "exception_type": "Missing Document"
+    },
+    {
+      "rule_id": "VR005",
+      "name": "balance_growth_check",
+      "condition": "current_balance <= original_balance * 2.0",
+      "severity": "high",
+      "exception_type": "Valuation Discrepancy"
+    }
+  ]
+}

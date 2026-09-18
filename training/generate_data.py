@@ -1,20 +1,20 @@
 """
-Synthetic Loan Performance Data Generator
-==========================================
-Generates all 7 organizer-format data files for the Loan Performance Intelligence Engine.
+Synthetic Loan Portfolio Generator
+====================================
+LoanLens ships with no real borrower data. This generates a synthetic loan
+tape panel (statics + monthly performance + a secondary servicer feed with
+intentionally injected conflicts) that the rest of the pipeline trains and
+scores against. Injects realistic messiness on purpose — MNAR-missing credit
+scores on older vintages, servicer/system-of-record disagreements, a handful
+of VR001-VR005 rule violations — so the anomaly and data-quality layers have
+something real to catch.
 
-Scale: ~50,000 loans x up to 36 months
-Seed:  42 (fixed for reproducibility)
-
-Output files:
-  - data/raw/loan_monthly_performance_train.csv
-  - data/raw/loan_monthly_performance_test.csv
-  - data/raw/loan_static_attributes.csv
-  - data/raw/servicer_updates.csv
-  - data/data_dictionary.md
-  - data/validation_rules.json
-  - data/macro_scenarios.csv
-  - submission/submission_template.csv
+Output files (under data/raw/ and data/):
+  - loan_static_attributes.csv
+  - loan_monthly_performance_train.csv / _test.csv (time-aware split by
+    origination month, zero loan_id overlap)
+  - servicer_updates.csv
+  - macro_scenarios.csv, validation_rules.json
 """
 
 import os
@@ -29,7 +29,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw"
 DATA_DIR = ROOT / "data"
 SUBMISSION_DIR = ROOT / "submission"
@@ -45,7 +45,7 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 SEED = 42
-N_LOANS = 50_000
+N_LOANS = 5_000  # demo-scale portfolio; pass --n-loans to generate larger
 MAX_MONTHS = 36
 DEFAULT_RATE = 0.04
 PREPAYMENT_RATE = 0.06
