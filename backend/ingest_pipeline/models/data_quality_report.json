@@ -1,0 +1,55 @@
+{
+  "n_records": 87324,
+  "n_loans": 4656,
+  "quality_score": {
+    "mean": 97.48,
+    "median": 100.0,
+    "grade": "A",
+    "pct_records_below_75": 0.46
+  },
+  "missingness_diagnosis": {
+    "interest_rate": {
+      "missing_pct": 3.686,
+      "vintage_spread_pp": 5.28,
+      "correlated_with": {},
+      "inferred_mechanism": "MCAR",
+      "rationale": "No significant dependency on vintage or other observed features \u2014 missingness looks unconditional."
+    },
+    "credit_score_band": {
+      "missing_pct": 6.732,
+      "vintage_spread_pp": 16.95,
+      "correlated_with": {
+        "interest_rate": -0.0335,
+        "next_3m_delinquency_flag": 0.042,
+        "next_6m_delinquency_flag": 0.0527,
+        "next_12m_default_flag": 0.0412
+      },
+      "inferred_mechanism": "MNAR",
+      "rationale": "Missingness rate varies by 16.9pp across origination vintages (2021: 0.0% -> 2004: 16.9%) \u2014 the value's own unobserved history (how old the record-keeping is) predicts whether it's missing, which is the definition of Missing Not At Random."
+    },
+    "loss_severity_band": {
+      "missing_pct": 99.238,
+      "vintage_spread_pp": 0.69,
+      "correlated_with": {
+        "days_past_due": -0.0631,
+        "default_flag": -1.0,
+        "exception_required": -0.6581
+      },
+      "inferred_mechanism": "MAR",
+      "rationale": "Missingness correlates with observed `default_flag` (r=-1.0)."
+    },
+    "exception_type": {
+      "missing_pct": 98.752,
+      "vintage_spread_pp": 1.24,
+      "correlated_with": {
+        "current_balance": -0.0617,
+        "days_past_due": -0.0613,
+        "modification_flag": -0.1549,
+        "default_flag": -0.6581,
+        "exception_required": -1.0
+      },
+      "inferred_mechanism": "MAR",
+      "rationale": "Missingness correlates with observed `exception_required` (r=-1.0)."
+    }
+  }
+}
