@@ -1,0 +1,107 @@
+{
+  "survival": {
+    "event_summary": {
+      "total_loans": 4656,
+      "defaulted": 665,
+      "prepaid": 516,
+      "censored_still_active": 3475
+    },
+    "competing_vs_single_risk": [
+      {
+        "horizon_months": 12,
+        "competing_risk_cif_default": 0.0845,
+        "single_risk_cif_default": 0.0894,
+        "single_risk_bias_pp": 0.49,
+        "competing_risk_cif_prepaid": 0.0654,
+        "single_risk_cif_prepaid": 0.0701
+      },
+      {
+        "horizon_months": 24,
+        "competing_risk_cif_default": 0.1565,
+        "single_risk_cif_default": 0.1658,
+        "single_risk_bias_pp": 0.93,
+        "competing_risk_cif_prepaid": 0.1202,
+        "single_risk_cif_prepaid": 0.1311
+      },
+      {
+        "horizon_months": 36,
+        "competing_risk_cif_default": 0.2167,
+        "single_risk_cif_default": 0.2313,
+        "single_risk_bias_pp": 1.46,
+        "competing_risk_cif_prepaid": 0.1814,
+        "single_risk_cif_prepaid": 0.2067
+      }
+    ],
+    "cif_by_credit_band": {
+      "<620": {
+        "n_loans": 354,
+        "12m_cif_default": 0.2195,
+        "36m_cif_default": 0.4996
+      },
+      "620-659": {
+        "n_loans": 474,
+        "12m_cif_default": 0.1382,
+        "36m_cif_default": 0.3933
+      },
+      "660-699": {
+        "n_loans": 838,
+        "12m_cif_default": 0.0957,
+        "36m_cif_default": 0.2501
+      },
+      "700-739": {
+        "n_loans": 1108,
+        "12m_cif_default": 0.0562,
+        "36m_cif_default": 0.1524
+      },
+      "740-779": {
+        "n_loans": 870,
+        "12m_cif_default": 0.0513,
+        "36m_cif_default": 0.1294
+      },
+      "780+": {
+        "n_loans": 684,
+        "12m_cif_default": 0.0191,
+        "36m_cif_default": 0.0811
+      }
+    },
+    "methodology": "Aalen-Johansen non-parametric CIF (lifelines) for the competing-risk estimate; cause-specific Kaplan-Meier (1 - survival) for the naive single-risk comparison, which treats the competing event as non-informative censoring and is expected to overstate risk."
+  },
+  "markov_transition_matrix": {
+    "Current": {
+      "Current": 0.9797,
+      "30-59 DPD": 0.0096,
+      "60-89 DPD": 0.0,
+      "90+ DPD": 0.0,
+      "Default": 0.0046,
+      "Prepaid": 0.0061,
+      "Paid Off": 0.0
+    },
+    "30-59 DPD": {
+      "Current": 0.3425,
+      "30-59 DPD": 0.2877,
+      "60-89 DPD": 0.2137,
+      "90+ DPD": 0.0,
+      "Default": 0.1562,
+      "Prepaid": 0.0,
+      "Paid Off": 0.0
+    },
+    "60-89 DPD": {
+      "Current": 0.2342,
+      "30-59 DPD": 0.0,
+      "60-89 DPD": 0.0,
+      "90+ DPD": 0.2973,
+      "Default": 0.4685,
+      "Prepaid": 0.0,
+      "Paid Off": 0.0
+    },
+    "90+ DPD": {
+      "Current": 0.0,
+      "30-59 DPD": 0.0,
+      "60-89 DPD": 0.0,
+      "90+ DPD": 1.0,
+      "Default": 0.0,
+      "Prepaid": 0.0,
+      "Paid Off": 0.0
+    }
+  }
+}
