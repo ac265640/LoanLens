@@ -1,0 +1,10 @@
+{
+  "name": "loanlens-cedar-gate",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Cedar policy-as-code authorization gate for loan approval / anomaly override actions",
+  "main": "handler.mjs",
+  "dependencies": {
+    "@cedar-policy/cedar-wasm": "4.13.0"
+  }
+}

@@ -1,0 +1,13 @@
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.aws-sam/
+.DS_Store
+dist/
+build/
+frontend/node_modules/
+frontend/.env
+*.log
