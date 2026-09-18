@@ -1,0 +1,56 @@
+{
+  "target_coverage": 0.9,
+  "method": "split conformal (inductive), nonconformity = |y - p_hat|, uniform half-width",
+  "calibration_set_size": 4785,
+  "eval_set_size": 4508,
+  "interval_half_width": 0.1882,
+  "empirical_coverage_on_eval": 0.9028,
+  "mean_interval_width": 0.2372,
+  "worked_examples_highest_risk": [
+    {
+      "loan_id": "LN0004126",
+      "point_estimate": 0.6529,
+      "interval_90pct": [
+        0.4648,
+        0.8411
+      ],
+      "actual_outcome": 0
+    },
+    {
+      "loan_id": "LN0004126",
+      "point_estimate": 0.6506,
+      "interval_90pct": [
+        0.4624,
+        0.8388
+      ],
+      "actual_outcome": 0
+    },
+    {
+      "loan_id": "LN0000943",
+      "point_estimate": 0.5447,
+      "interval_90pct": [
+        0.3565,
+        0.7329
+      ],
+      "actual_outcome": 0
+    },
+    {
+      "loan_id": "LN0003261",
+      "point_estimate": 0.5061,
+      "interval_90pct": [
+        0.3179,
+        0.6943
+      ],
+      "actual_outcome": 1
+    },
+    {
+      "loan_id": "LN0004106",
+      "point_estimate": 0.5046,
+      "interval_90pct": [
+        0.3164,
+        0.6928
+      ],
+      "actual_outcome": 0
+    }
+  ]
+}
