@@ -1,0 +1,386 @@
+[
+  {
+    "loan_id": "LN0004159",
+    "base_probability": 0.2651,
+    "counterfactuals": [
+      {
+        "feature": "dti_ordinal",
+        "change": "DTI improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 2.0,
+        "base_probability": 0.2651,
+        "counterfactual_probability": 0.2565,
+        "probability_reduction": 0.0086
+      },
+      {
+        "feature": "ltv_ordinal",
+        "change": "LTV improved one tier",
+        "current_value": 4.0,
+        "counterfactual_value": 3.0,
+        "base_probability": 0.2651,
+        "counterfactual_probability": 0.2625,
+        "probability_reduction": 0.0026
+      },
+      {
+        "feature": "days_past_due",
+        "change": "DPD cured to 0",
+        "current_value": 30.0,
+        "counterfactual_value": 0.0,
+        "base_probability": 0.2651,
+        "counterfactual_probability": 0.2651,
+        "probability_reduction": 0.0
+      },
+      {
+        "feature": "credit_score_ordinal",
+        "change": "credit score improved one tier",
+        "current_value": 1.0,
+        "counterfactual_value": 2.0,
+        "base_probability": 0.2651,
+        "counterfactual_probability": 0.2734,
+        "probability_reduction": -0.0083
+      }
+    ]
+  },
+  {
+    "loan_id": "LN0003631",
+    "base_probability": 0.2496,
+    "counterfactuals": [
+      {
+        "feature": "credit_score_ordinal",
+        "change": "credit score improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 4.0,
+        "base_probability": 0.2496,
+        "counterfactual_probability": 0.1573,
+        "probability_reduction": 0.0923
+      },
+      {
+        "feature": "ltv_ordinal",
+        "change": "LTV improved one tier",
+        "current_value": 5.0,
+        "counterfactual_value": 4.0,
+        "base_probability": 0.2496,
+        "counterfactual_probability": 0.2599,
+        "probability_reduction": -0.0103
+      },
+      {
+        "feature": "dti_ordinal",
+        "change": "DTI improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 2.0,
+        "base_probability": 0.2496,
+        "counterfactual_probability": 0.2943,
+        "probability_reduction": -0.0448
+      }
+    ]
+  },
+  {
+    "loan_id": "LN0000891",
+    "base_probability": 0.2254,
+    "counterfactuals": [
+      {
+        "feature": "ltv_ordinal",
+        "change": "LTV improved one tier",
+        "current_value": 4.0,
+        "counterfactual_value": 3.0,
+        "base_probability": 0.2254,
+        "counterfactual_probability": 0.116,
+        "probability_reduction": 0.1094
+      },
+      {
+        "feature": "days_past_due",
+        "change": "DPD cured to 0",
+        "current_value": 30.0,
+        "counterfactual_value": 0.0,
+        "base_probability": 0.2254,
+        "counterfactual_probability": 0.2254,
+        "probability_reduction": 0.0
+      },
+      {
+        "feature": "credit_score_ordinal",
+        "change": "credit score improved one tier",
+        "current_value": 0.0,
+        "counterfactual_value": 1.0,
+        "base_probability": 0.2254,
+        "counterfactual_probability": 0.2409,
+        "probability_reduction": -0.0155
+      },
+      {
+        "feature": "dti_ordinal",
+        "change": "DTI improved one tier",
+        "current_value": 2.0,
+        "counterfactual_value": 1.0,
+        "base_probability": 0.2254,
+        "counterfactual_probability": 0.2525,
+        "probability_reduction": -0.0271
+      }
+    ]
+  },
+  {
+    "loan_id": "LN0003954",
+    "base_probability": 0.2099,
+    "counterfactuals": [
+      {
+        "feature": "credit_score_ordinal",
+        "change": "credit score improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 4.0,
+        "base_probability": 0.2099,
+        "counterfactual_probability": 0.1095,
+        "probability_reduction": 0.1004
+      },
+      {
+        "feature": "ltv_ordinal",
+        "change": "LTV improved one tier",
+        "current_value": 5.0,
+        "counterfactual_value": 4.0,
+        "base_probability": 0.2099,
+        "counterfactual_probability": 0.1266,
+        "probability_reduction": 0.0833
+      },
+      {
+        "feature": "dti_ordinal",
+        "change": "DTI improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 2.0,
+        "base_probability": 0.2099,
+        "counterfactual_probability": 0.1856,
+        "probability_reduction": 0.0243
+      },
+      {
+        "feature": "days_past_due",
+        "change": "DPD cured to 0",
+        "current_value": 30.0,
+        "counterfactual_value": 0.0,
+        "base_probability": 0.2099,
+        "counterfactual_probability": 0.2099,
+        "probability_reduction": 0.0
+      }
+    ]
+  },
+  {
+    "loan_id": "LN0003570",
+    "base_probability": 0.2026,
+    "counterfactuals": [
+      {
+        "feature": "credit_score_ordinal",
+        "change": "credit score improved one tier",
+        "current_value": 2.0,
+        "counterfactual_value": 3.0,
+        "base_probability": 0.2026,
+        "counterfactual_probability": 0.1487,
+        "probability_reduction": 0.0539
+      },
+      {
+        "feature": "ltv_ordinal",
+        "change": "LTV improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 2.0,
+        "base_probability": 0.2026,
+        "counterfactual_probability": 0.1791,
+        "probability_reduction": 0.0234
+      },
+      {
+        "feature": "dti_ordinal",
+        "change": "DTI improved one tier",
+        "current_value": 5.0,
+        "counterfactual_value": 4.0,
+        "base_probability": 0.2026,
+        "counterfactual_probability": 0.1992,
+        "probability_reduction": 0.0034
+      },
+      {
+        "feature": "days_past_due",
+        "change": "DPD cured to 0",
+        "current_value": 30.0,
+        "counterfactual_value": 0.0,
+        "base_probability": 0.2026,
+        "counterfactual_probability": 0.2026,
+        "probability_reduction": 0.0
+      }
+    ]
+  },
+  {
+    "loan_id": "LN0000740",
+    "base_probability": 0.1969,
+    "counterfactuals": [
+      {
+        "feature": "ltv_ordinal",
+        "change": "LTV improved one tier",
+        "current_value": 2.0,
+        "counterfactual_value": 1.0,
+        "base_probability": 0.1969,
+        "counterfactual_probability": 0.0843,
+        "probability_reduction": 0.1126
+      },
+      {
+        "feature": "credit_score_ordinal",
+        "change": "credit score improved one tier",
+        "current_value": 1.0,
+        "counterfactual_value": 2.0,
+        "base_probability": 0.1969,
+        "counterfactual_probability": 0.1552,
+        "probability_reduction": 0.0417
+      },
+      {
+        "feature": "days_past_due",
+        "change": "DPD cured to 0",
+        "current_value": 30.0,
+        "counterfactual_value": 0.0,
+        "base_probability": 0.1969,
+        "counterfactual_probability": 0.1969,
+        "probability_reduction": 0.0
+      },
+      {
+        "feature": "dti_ordinal",
+        "change": "DTI improved one tier",
+        "current_value": 2.0,
+        "counterfactual_value": 1.0,
+        "base_probability": 0.1969,
+        "counterfactual_probability": 0.2196,
+        "probability_reduction": -0.0227
+      }
+    ]
+  },
+  {
+    "loan_id": "LN0003173",
+    "base_probability": 0.1957,
+    "counterfactuals": [
+      {
+        "feature": "ltv_ordinal",
+        "change": "LTV improved one tier",
+        "current_value": 2.0,
+        "counterfactual_value": 1.0,
+        "base_probability": 0.1957,
+        "counterfactual_probability": 0.1234,
+        "probability_reduction": 0.0723
+      },
+      {
+        "feature": "credit_score_ordinal",
+        "change": "credit score improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 4.0,
+        "base_probability": 0.1957,
+        "counterfactual_probability": 0.1401,
+        "probability_reduction": 0.0556
+      },
+      {
+        "feature": "dti_ordinal",
+        "change": "DTI improved one tier",
+        "current_value": 2.0,
+        "counterfactual_value": 1.0,
+        "base_probability": 0.1957,
+        "counterfactual_probability": 0.2001,
+        "probability_reduction": -0.0044
+      }
+    ]
+  },
+  {
+    "loan_id": "LN0002045",
+    "base_probability": 0.1898,
+    "counterfactuals": [
+      {
+        "feature": "ltv_ordinal",
+        "change": "LTV improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 2.0,
+        "base_probability": 0.1898,
+        "counterfactual_probability": 0.1363,
+        "probability_reduction": 0.0535
+      },
+      {
+        "feature": "dti_ordinal",
+        "change": "DTI improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 2.0,
+        "base_probability": 0.1898,
+        "counterfactual_probability": 0.1618,
+        "probability_reduction": 0.028
+      },
+      {
+        "feature": "credit_score_ordinal",
+        "change": "credit score improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 4.0,
+        "base_probability": 0.1898,
+        "counterfactual_probability": 0.2005,
+        "probability_reduction": -0.0107
+      }
+    ]
+  },
+  {
+    "loan_id": "LN0001469",
+    "base_probability": 0.1849,
+    "counterfactuals": [
+      {
+        "feature": "dti_ordinal",
+        "change": "DTI improved one tier",
+        "current_value": 2.0,
+        "counterfactual_value": 1.0,
+        "base_probability": 0.1849,
+        "counterfactual_probability": 0.1726,
+        "probability_reduction": 0.0122
+      },
+      {
+        "feature": "ltv_ordinal",
+        "change": "LTV improved one tier",
+        "current_value": 5.0,
+        "counterfactual_value": 4.0,
+        "base_probability": 0.1849,
+        "counterfactual_probability": 0.1912,
+        "probability_reduction": -0.0063
+      },
+      {
+        "feature": "credit_score_ordinal",
+        "change": "credit score improved one tier",
+        "current_value": 0.0,
+        "counterfactual_value": 1.0,
+        "base_probability": 0.1849,
+        "counterfactual_probability": 0.221,
+        "probability_reduction": -0.0361
+      }
+    ]
+  },
+  {
+    "loan_id": "LN0002204",
+    "base_probability": 0.1821,
+    "counterfactuals": [
+      {
+        "feature": "credit_score_ordinal",
+        "change": "credit score improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 4.0,
+        "base_probability": 0.1821,
+        "counterfactual_probability": 0.1427,
+        "probability_reduction": 0.0394
+      },
+      {
+        "feature": "ltv_ordinal",
+        "change": "LTV improved one tier",
+        "current_value": 6.0,
+        "counterfactual_value": 5.0,
+        "base_probability": 0.1821,
+        "counterfactual_probability": 0.1536,
+        "probability_reduction": 0.0285
+      },
+      {
+        "feature": "days_past_due",
+        "change": "DPD cured to 0",
+        "current_value": 30.0,
+        "counterfactual_value": 0.0,
+        "base_probability": 0.1821,
+        "counterfactual_probability": 0.1821,
+        "probability_reduction": 0.0
+      },
+      {
+        "feature": "dti_ordinal",
+        "change": "DTI improved one tier",
+        "current_value": 3.0,
+        "counterfactual_value": 2.0,
+        "base_probability": 0.1821,
+        "counterfactual_probability": 0.1933,
+        "probability_reduction": -0.0112
+      }
+    ]
+  }
+]
