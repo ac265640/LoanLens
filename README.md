@@ -62,6 +62,22 @@ training run:
    the held-out validation cohort
 4. `training/train_anomaly_models.py` — Isolation Forest + a hybrid LightGBM exception
    classifier combining it with the deterministic VR001–VR005 rules
+5. `training/profile_data.py` — per-record data quality score (8 auditable penalty rules)
+   + MCAR/MAR/MNAR missingness diagnosis (97.48/100, Grade A on this portfolio)
+6. `training/survival_analysis.py` — Aalen-Johansen competing-risk CIF vs. naive
+   single-risk Kaplan-Meier (default and prepayment are competing terminal events —
+   treating them as independent overstates default risk) + empirical Markov transition
+   matrix
+7. `training/explainability.py` — TreeSHAP global/local attributions, calibration
+   reliability diagnostics (ECE), and a four-fifths-rule disparate-impact fairness audit
+8. `training/scenario_segments.py` — the 3 named macro scenarios broken down by credit
+   band, vintage era, and state (complements the dashboard's live Shockwave sliders)
+9. `training/counterfactuals.py` — "what single change reduces this loan's risk most",
+   answered by re-running the real calibrated model on perturbed features, not a proxy
+10. `training/conformal_intervals.py` — distribution-free 90% prediction intervals,
+    empirically validated at 90.28% coverage on a held-out split
+11. `tests/` (pytest, 22 tests) + `backend/cedar_gate/test_policies.mjs` (8 Cedar
+    authorization scenarios) — `make test cedar-test` runs both
 
 Everything downstream of the trained models — the AWS deployment, the Cedar governance
 gate, the Bedrock copilot, the live stress simulator, the dashboard — is new, built
@@ -104,14 +120,12 @@ override action in the UI runs through this gate live.
 ## Setup
 
 ```bash
-# 1. (Optional) Regenerate data and retrain from scratch — the repo already
-#    ships with trained model artifacts under backend/ingest_pipeline/models/
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r training/requirements.txt
-python3 training/generate_data.py
-python3 training/train_prediction_models.py
-python3 training/train_anomaly_models.py
-python3 scripts/precompute_stress_grid.py   # rebuild the Shockwave grid to match
+# 1. (Optional) Regenerate data and retrain everything from scratch — the
+#    repo already ships with trained model artifacts and analysis reports
+#    under backend/ingest_pipeline/models/
+make setup            # creates .venv, installs training/requirements.txt
+make run-all           # generate -> train -> analyze -> test, ~60-90s
+# (see the Makefile for the individual targets this chains together)
 
 # 2. Backend
 cd infra
