@@ -44,21 +44,37 @@ still being a real, deployed, judge-clickable Ship It submission.
        └────────────────────────────────────────────────────────────────────────┘
 ```
 
-## What's genuinely new here vs. the original prototype
+## Built during this hackathon
 
-The credit-risk modeling (5 LightGBM prediction targets, Isolation Forest anomaly
-detection, the deterministic VR001–VR005 rule engine, feature engineering) is carried
-over — it's already trained and validated, and retraining it wouldn't teach us anything
-new about AWS. Everything around it is new, built during this hackathon:
+Every model in `backend/ingest_pipeline/models/` is trained by the scripts in
+`training/`, against this repo's own synthetic portfolio (`training/generate_data.py`) —
+nothing here is a pre-trained artifact dropped in from elsewhere. See `training/*.py` and
+`backend/ingest_pipeline/models/prediction_metrics.json` for the real, reproducible
+training run:
 
-| | Before | Now |
+1. `training/generate_data.py` — synthetic loan portfolio (statics + monthly performance
+   panel + a secondary servicer feed with injected conflicts), fully self-contained, no
+   real borrower data
+2. `training/splitter.py` — time-aware cohort split (train/val by origination month, with
+   a hard loan_id-leakage assertion)
+3. `training/train_prediction_models.py` — 4 binary LightGBM targets (3M/6M delinquency,
+   12M default, 12M prepayment) + 1 multiclass (next-month status), Platt-calibrated on
+   the held-out validation cohort
+4. `training/train_anomaly_models.py` — Isolation Forest + a hybrid LightGBM exception
+   classifier combining it with the deterministic VR001–VR005 rules
+
+Everything downstream of the trained models — the AWS deployment, the Cedar governance
+gate, the Bedrock copilot, the live stress simulator, the dashboard — is new, built
+specifically for this hackathon:
+
+| | Elsewhere-style prototype | LoanLens (this repo) |
 |---|---|---|
 | Hosting | Local Streamlit | S3 + Lambda + API Gateway + Amplify, live URL |
-| Trigger | Manual `make run-all` | S3 upload → EventBridge → Step Functions, automatic |
-| LLM copilot | Gemini/OpenAI, single mode | **Amazon Bedrock**, 3 grounded modes |
+| Trigger | Manual pipeline run | S3 upload → EventBridge → Step Functions, automatic |
+| LLM copilot | Single-mode, non-AWS LLM | **Amazon Bedrock**, 3 grounded modes |
 | Governance | None | **AWS Cedar** policy-as-code authorization gate |
 | Stress testing | 3 fixed scenarios | Live interactive sliders over a precomputed response grid |
-| Audit log | Local JSONL file | DynamoDB, queryable |
+| Audit log | Local file | DynamoDB, queryable |
 | UI | Streamlit multi-page | React + Vite + Tailwind, dark glassmorphic |
 
 ## AWS services used
@@ -88,16 +104,19 @@ override action in the UI runs through this gate live.
 ## Setup
 
 ```bash
-# 1. Backend
+# 1. (Optional) Regenerate data and retrain from scratch — the repo already
+#    ships with trained model artifacts under backend/ingest_pipeline/models/
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r training/requirements.txt
+python3 training/generate_data.py
+python3 training/train_prediction_models.py
+python3 training/train_anomaly_models.py
+python3 scripts/precompute_stress_grid.py   # rebuild the Shockwave grid to match
+
+# 2. Backend
 cd infra
 sam build
 sam deploy --guided   # first time only; writes samconfig.toml
-
-# 2. Precompute the stress grid (needed once before first deploy, or after
-#    changing the demo portfolio)
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r ../backend/ingest_pipeline/requirements.txt
-python3 ../scripts/precompute_stress_grid.py
 
 # 3. Frontend
 cd ../frontend
@@ -114,6 +133,8 @@ code, the React dashboard, and the Cedar-on-Lambda feasibility spike.
 
 ## Credit / licensing
 
-The original credit-risk model design, feature set, and synthetic dataset generator
-(`scripts/generate_synthetic_data.py`) are the authors' own prior work. The demo
-portfolio (`data/sample/demo_loan_tape.csv`) is fully synthetic — no real borrower data.
+The credit-risk modeling approach (feature set, target definitions, calibration
+methodology) builds on the authors' own prior work. All code in this repo, the
+synthetic data generator, and every trained model artifact were (re)built during this
+hackathon — see `training/` and the commit history. The demo portfolio
+(`data/sample/demo_loan_tape.csv`) is fully synthetic — no real borrower data.
