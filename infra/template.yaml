@@ -1,0 +1,249 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  LoanLens — Autonomous Credit Underwriting & Portfolio Risk Intelligence.
+  Serverless-only by design (no idle EC2/SageMaker/OpenSearch) to stay well
+  inside a $100 AWS credit budget: everything here scales to zero.
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Environment:
+      Variables:
+        LOANS_TABLE: !Ref LoansTable
+        RUNS_TABLE: !Ref RunsTable
+        AUDIT_TABLE: !Ref CopilotAuditTable
+
+Parameters:
+  BedrockModelId:
+    Type: String
+    Default: amazon.nova-lite-v1:0
+    Description: Bedrock model id used by the reviewer copilot (Amazon Nova Lite by default — cheap and fast; swap for an Anthropic model id once access is approved).
+
+Resources:
+  # ---------- Storage ----------
+  LoanTapesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "loanlens-tapes-${AWS::AccountId}-${AWS::Region}"
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: [GET, PUT, POST]
+            AllowedOrigins: ["*"]
+            AllowedHeaders: ["*"]
+
+  LoansTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: loanlens-loans
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: loan_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: loan_id
+          KeyType: HASH
+
+  RunsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: loanlens-runs
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: run_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: run_id
+          KeyType: HASH
+
+  CopilotAuditTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: loanlens-copilot-audit
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: call_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: call_id
+          KeyType: HASH
+
+  # ---------- Ingest pipeline (container image Lambda: pandas/lightgbm/sklearn) ----------
+  IngestPipelineFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: loanlens-ingest-pipeline
+      PackageType: Image
+      Timeout: 120
+      MemorySize: 1536
+      ImageUri: !Sub "${IngestPipelineRepo}:latest"
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref LoanTapesBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LoansTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RunsTable
+    Metadata:
+      DockerTag: latest
+      DockerContext: ../backend/ingest_pipeline
+      Dockerfile: Dockerfile
+
+  IngestPipelineRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: loanlens-ingest-pipeline
+
+  # ---------- Cedar policy gate (Node.js, cedar-wasm) ----------
+  CedarGateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: loanlens-cedar-gate
+      CodeUri: ../backend/cedar_gate/
+      Handler: handler.handler
+      Runtime: nodejs22.x
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LoanLensApi
+            Path: /cedar/authorize
+            Method: POST
+
+  # ---------- Bedrock reviewer copilot ----------
+  CopilotFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: loanlens-copilot
+      CodeUri: ../backend/copilot/
+      Handler: handler.handler
+      Runtime: python3.11
+      Timeout: 60
+      Environment:
+        Variables:
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LoansTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CopilotAuditTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:Converse
+              Resource: "*"
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LoanLensApi
+            Path: /copilot
+            Method: POST
+
+  # ---------- Stress "Shockwave" grid query ----------
+  StressQueryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: loanlens-stress-query
+      CodeUri: ../backend/stress_query/
+      Handler: handler.handler
+      Runtime: python3.11
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LoanLensApi
+            Path: /stress
+            Method: POST
+
+  # ---------- Portfolio read API (dashboard table) ----------
+  PortfolioApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: loanlens-portfolio-api
+      CodeUri: ../backend/portfolio_api/
+      Handler: handler.handler
+      Runtime: python3.11
+      Environment:
+        Variables:
+          TAPES_BUCKET: !Ref LoanTapesBucket
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref LoansTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref RunsTable
+        - S3WritePolicy:
+            BucketName: !Ref LoanTapesBucket
+      Events:
+        Loans:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LoanLensApi
+            Path: /loans
+            Method: GET
+        LoanById:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LoanLensApi
+            Path: /loans/{loan_id}
+            Method: GET
+        Runs:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LoanLensApi
+            Path: /runs/{run_id}
+            Method: GET
+        UploadUrl:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LoanLensApi
+            Path: /upload-url
+            Method: POST
+
+  LoanLensApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+
+  # ---------- Step Functions: orchestrates ingest on new tape upload ----------
+  IngestStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: loanlens-ingest-pipeline
+      DefinitionUri: statemachine/ingest.asl.json
+      DefinitionSubstitutions:
+        IngestPipelineFunctionArn: !GetAtt IngestPipelineFunction.Arn
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref IngestPipelineFunction
+      Events:
+        NewTapeUploaded:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source: ["aws.s3"]
+              detail-type: ["Object Created"]
+              detail:
+                bucket:
+                  name: [!Ref LoanTapesBucket]
+                object:
+                  key:
+                    - prefix: "raw/"
+
+Outputs:
+  ApiUrl:
+    Description: Base URL for the LoanLens API
+    Value: !Sub "https://${LoanLensApi}.execute-api.${AWS::Region}.amazonaws.com/prod"
+  LoanTapesBucketName:
+    Value: !Ref LoanTapesBucket
+  StateMachineArn:
+    Value: !Ref IngestStateMachine

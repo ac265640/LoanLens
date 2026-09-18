@@ -1,0 +1,28 @@
+{
+  "Comment": "LoanLens ingest pipeline: triggered by a new loan tape landing in s3://loanlens-tapes/raw/, scores 100% of the portfolio via the ingest_pipeline Lambda and writes results to DynamoDB.",
+  "StartAt": "PrepareRun",
+  "States": {
+    "PrepareRun": {
+      "Type": "Pass",
+      "Parameters": {
+        "bucket.$": "$.detail.bucket.name",
+        "key.$": "$.detail.object.key",
+        "run_id.$": "$$.Execution.Name"
+      },
+      "Next": "ScoreLoanTape"
+    },
+    "ScoreLoanTape": {
+      "Type": "Task",
+      "Resource": "${IngestPipelineFunctionArn}",
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "End": true
+    }
+  }
+}
