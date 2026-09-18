@@ -172,7 +172,13 @@ def handler(event, context):
     """
     bucket = event["bucket"]
     key = event["key"]
-    run_id = event.get("run_id", str(int(time.time())))
+    # Deterministic id derived from the S3 key so the frontend can poll for
+    # this exact run right after it PUTs the file, without needing to know
+    # the Step Functions execution name.
+    default_run_id = key.replace("/", "_")
+    if default_run_id.endswith(".csv"):
+        default_run_id = default_run_id[: -len(".csv")]
+    run_id = event.get("run_id") or default_run_id
 
     log.info(f"Scoring loan tape s3://{bucket}/{key} (run_id={run_id})")
     obj = s3.get_object(Bucket=bucket, Key=key)

@@ -6,8 +6,7 @@
       "Type": "Pass",
       "Parameters": {
         "bucket.$": "$.detail.bucket.name",
-        "key.$": "$.detail.object.key",
-        "run_id.$": "$$.Execution.Name"
+        "key.$": "$.detail.object.key"
       },
       "Next": "ScoreLoanTape"
     },
