@@ -1,0 +1,200 @@
+{
+  "base": {
+    "description": "Base case \u2014 steady macro environment.",
+    "portfolio_mean_12m_default_pct": 3.98,
+    "by_credit_band": {
+      "620-659": {
+        "mean_12m_default_prob_pct": 4.43,
+        "n_loans": 474
+      },
+      "660-699": {
+        "mean_12m_default_prob_pct": 4.11,
+        "n_loans": 838
+      },
+      "700-739": {
+        "mean_12m_default_prob_pct": 3.8,
+        "n_loans": 1108
+      },
+      "740-779": {
+        "mean_12m_default_prob_pct": 3.8,
+        "n_loans": 870
+      },
+      "780+": {
+        "mean_12m_default_prob_pct": 3.58,
+        "n_loans": 684
+      },
+      "<620": {
+        "mean_12m_default_prob_pct": 4.6,
+        "n_loans": 354
+      }
+    },
+    "by_vintage_era": {
+      "2011-2018": {
+        "mean_12m_default_prob_pct": 3.88,
+        "n_loans": 2035
+      },
+      "2019+": {
+        "mean_12m_default_prob_pct": 4.09,
+        "n_loans": 708
+      },
+      "Pre-2010": {
+        "mean_12m_default_prob_pct": 4.04,
+        "n_loans": 1913
+      }
+    },
+    "by_top_5_states": {
+      "IN": {
+        "mean_12m_default_prob_pct": 3.94,
+        "n_loans": 259
+      },
+      "NY": {
+        "mean_12m_default_prob_pct": 3.89,
+        "n_loans": 250
+      },
+      "FL": {
+        "mean_12m_default_prob_pct": 3.75,
+        "n_loans": 245
+      },
+      "TX": {
+        "mean_12m_default_prob_pct": 3.92,
+        "n_loans": 244
+      },
+      "GA": {
+        "mean_12m_default_prob_pct": 3.93,
+        "n_loans": 240
+      }
+    }
+  },
+  "adverse_credit": {
+    "description": "Adverse credit stress: rate rise 150bps, unemployment +2.5pp, HPI -8%.",
+    "portfolio_mean_12m_default_pct": 9.88,
+    "by_credit_band": {
+      "620-659": {
+        "mean_12m_default_prob_pct": 10.91,
+        "n_loans": 474
+      },
+      "660-699": {
+        "mean_12m_default_prob_pct": 9.54,
+        "n_loans": 838
+      },
+      "700-739": {
+        "mean_12m_default_prob_pct": 9.07,
+        "n_loans": 1108
+      },
+      "740-779": {
+        "mean_12m_default_prob_pct": 8.82,
+        "n_loans": 870
+      },
+      "780+": {
+        "mean_12m_default_prob_pct": 8.06,
+        "n_loans": 684
+      },
+      "<620": {
+        "mean_12m_default_prob_pct": 13.78,
+        "n_loans": 354
+      }
+    },
+    "by_vintage_era": {
+      "2011-2018": {
+        "mean_12m_default_prob_pct": 9.37,
+        "n_loans": 2035
+      },
+      "2019+": {
+        "mean_12m_default_prob_pct": 9.84,
+        "n_loans": 708
+      },
+      "Pre-2010": {
+        "mean_12m_default_prob_pct": 10.43,
+        "n_loans": 1913
+      }
+    },
+    "by_top_5_states": {
+      "IN": {
+        "mean_12m_default_prob_pct": 9.93,
+        "n_loans": 259
+      },
+      "NY": {
+        "mean_12m_default_prob_pct": 9.47,
+        "n_loans": 250
+      },
+      "FL": {
+        "mean_12m_default_prob_pct": 9.07,
+        "n_loans": 245
+      },
+      "TX": {
+        "mean_12m_default_prob_pct": 9.83,
+        "n_loans": 244
+      },
+      "GA": {
+        "mean_12m_default_prob_pct": 9.77,
+        "n_loans": 240
+      }
+    }
+  },
+  "high_prepayment": {
+    "description": "High prepayment: rates drop 75bps, refi boom.",
+    "portfolio_mean_12m_default_pct": 3.0,
+    "by_credit_band": {
+      "620-659": {
+        "mean_12m_default_prob_pct": 3.33,
+        "n_loans": 474
+      },
+      "660-699": {
+        "mean_12m_default_prob_pct": 3.11,
+        "n_loans": 838
+      },
+      "700-739": {
+        "mean_12m_default_prob_pct": 2.88,
+        "n_loans": 1108
+      },
+      "740-779": {
+        "mean_12m_default_prob_pct": 2.88,
+        "n_loans": 870
+      },
+      "780+": {
+        "mean_12m_default_prob_pct": 2.69,
+        "n_loans": 684
+      },
+      "<620": {
+        "mean_12m_default_prob_pct": 3.47,
+        "n_loans": 354
+      }
+    },
+    "by_vintage_era": {
+      "2011-2018": {
+        "mean_12m_default_prob_pct": 2.93,
+        "n_loans": 2035
+      },
+      "2019+": {
+        "mean_12m_default_prob_pct": 3.06,
+        "n_loans": 708
+      },
+      "Pre-2010": {
+        "mean_12m_default_prob_pct": 3.06,
+        "n_loans": 1913
+      }
+    },
+    "by_top_5_states": {
+      "IN": {
+        "mean_12m_default_prob_pct": 2.96,
+        "n_loans": 259
+      },
+      "NY": {
+        "mean_12m_default_prob_pct": 2.95,
+        "n_loans": 250
+      },
+      "FL": {
+        "mean_12m_default_prob_pct": 2.84,
+        "n_loans": 245
+      },
+      "TX": {
+        "mean_12m_default_prob_pct": 2.98,
+        "n_loans": 244
+      },
+      "GA": {
+        "mean_12m_default_prob_pct": 3.0,
+        "n_loans": 240
+      }
+    }
+  }
+}
