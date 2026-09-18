@@ -1,0 +1,310 @@
+{
+  "evaluated_target": "next_12m_default_flag",
+  "shap_explanations": {
+    "global_importance_top15": {
+      "credit_score_ordinal": 0.5,
+      "ltv_ordinal": 0.3247,
+      "state_freq": 0.2846,
+      "original_balance": 0.1574,
+      "dti_ordinal": 0.156,
+      "orig_year": 0.1399,
+      "current_status_code": 0.1385,
+      "servicer_name_freq": 0.0958,
+      "interest_rate_imputed": 0.0852,
+      "loan_age_months": 0.0841,
+      "current_balance": 0.0828,
+      "loan_purpose_freq": 0.0787,
+      "balance_to_orig_ratio": 0.0638,
+      "rate_to_market_spread": 0.0631,
+      "remaining_term_months": 0.04
+    },
+    "worked_local_examples": [
+      {
+        "row_index": 7931,
+        "predicted_prob": 0.6529,
+        "base_value": -3.3756,
+        "top_drivers": [
+          {
+            "feature": "current_status_code",
+            "shap_contribution": 1.6356,
+            "feature_value": 1.0
+          },
+          {
+            "feature": "credit_score_ordinal",
+            "shap_contribution": 1.3781,
+            "feature_value": 1.0
+          },
+          {
+            "feature": "dti_ordinal",
+            "shap_contribution": 0.3204,
+            "feature_value": 4.0
+          },
+          {
+            "feature": "ltv_ordinal",
+            "shap_contribution": 0.3095,
+            "feature_value": 4.0
+          },
+          {
+            "feature": "property_type_freq",
+            "shap_contribution": 0.2186,
+            "feature_value": 0.059
+          }
+        ]
+      },
+      {
+        "row_index": 7930,
+        "predicted_prob": 0.6506,
+        "base_value": -3.3756,
+        "top_drivers": [
+          {
+            "feature": "current_status_code",
+            "shap_contribution": 1.581,
+            "feature_value": 1.0
+          },
+          {
+            "feature": "credit_score_ordinal",
+            "shap_contribution": 1.3908,
+            "feature_value": 1.0
+          },
+          {
+            "feature": "dti_ordinal",
+            "shap_contribution": 0.3548,
+            "feature_value": 4.0
+          },
+          {
+            "feature": "ltv_ordinal",
+            "shap_contribution": 0.317,
+            "feature_value": 4.0
+          },
+          {
+            "feature": "property_type_freq",
+            "shap_contribution": 0.218,
+            "feature_value": 0.059
+          }
+        ]
+      },
+      {
+        "row_index": 0,
+        "predicted_prob": 0.6476,
+        "base_value": -3.3756,
+        "top_drivers": [
+          {
+            "feature": "current_status_code",
+            "shap_contribution": 1.5696,
+            "feature_value": 1.0
+          },
+          {
+            "feature": "credit_score_ordinal",
+            "shap_contribution": 1.3911,
+            "feature_value": 1.0
+          },
+          {
+            "feature": "ltv_ordinal",
+            "shap_contribution": 0.5246,
+            "feature_value": 5.0
+          },
+          {
+            "feature": "dti_ordinal",
+            "shap_contribution": 0.3573,
+            "feature_value": 5.0
+          },
+          {
+            "feature": "state_freq",
+            "shap_contribution": -0.2042,
+            "feature_value": 0.0664
+          }
+        ]
+      }
+    ]
+  },
+  "calibration_diagnostics": {
+    "expected_calibration_error": 0.0174,
+    "reliability_curve": [
+      {
+        "predicted_bin_mean": 0.0326,
+        "actual_empirical_rate": 0.0366,
+        "n": 7729
+      },
+      {
+        "predicted_bin_mean": 0.1369,
+        "actual_empirical_rate": 0.09,
+        "n": 1111
+      },
+      {
+        "predicted_bin_mean": 0.2395,
+        "actual_empirical_rate": 0.119,
+        "n": 294
+      },
+      {
+        "predicted_bin_mean": 0.3465,
+        "actual_empirical_rate": 0.1,
+        "n": 120
+      },
+      {
+        "predicted_bin_mean": 0.4397,
+        "actual_empirical_rate": 0.1818,
+        "n": 22
+      },
+      {
+        "predicted_bin_mean": 0.5468,
+        "actual_empirical_rate": 0.1818,
+        "n": 11
+      },
+      {
+        "predicted_bin_mean": 0.6337,
+        "actual_empirical_rate": 0.0,
+        "n": 6
+      }
+    ]
+  },
+  "fairness_audit": {
+    "by_credit_band": {
+      "threshold": 0.1,
+      "by_group": {
+        "620-659": {
+          "n": 1076,
+          "actual_default_rate": 0.0827,
+          "predicted_positive_rate": 0.355,
+          "demographic_parity_ratio": 2.1095,
+          "false_positive_rate": 0.3495,
+          "subgroup_auc": 0.5454
+        },
+        "660-699": {
+          "n": 1598,
+          "actual_default_rate": 0.0513,
+          "predicted_positive_rate": 0.1395,
+          "demographic_parity_ratio": 0.8292,
+          "false_positive_rate": 0.1365,
+          "subgroup_auc": 0.4738
+        },
+        "700-739": {
+          "n": 2385,
+          "actual_default_rate": 0.0403,
+          "predicted_positive_rate": 0.0981,
+          "demographic_parity_ratio": 0.583,
+          "false_positive_rate": 0.097,
+          "subgroup_auc": 0.5627
+        },
+        "740-779": {
+          "n": 1734,
+          "actual_default_rate": 0.015,
+          "predicted_positive_rate": 0.1217,
+          "demographic_parity_ratio": 0.723,
+          "false_positive_rate": 0.1165,
+          "subgroup_auc": 0.5979
+        },
+        "780+": {
+          "n": 1796,
+          "actual_default_rate": 0.0256,
+          "predicted_positive_rate": 0.0345,
+          "demographic_parity_ratio": 0.2051,
+          "false_positive_rate": 0.0343,
+          "subgroup_auc": 0.823
+        },
+        "<620": {
+          "n": 647,
+          "actual_default_rate": 0.1499,
+          "predicted_positive_rate": 0.6754,
+          "demographic_parity_ratio": 4.0133,
+          "false_positive_rate": 0.66,
+          "subgroup_auc": 0.5567
+        }
+      },
+      "four_fifths_rule": {
+        "description": "Demographic parity ratio between 0.80 and 1.25 across groups is the standard US fair-lending threshold.",
+        "min_ratio_observed": 0.2051,
+        "passes": false
+      }
+    },
+    "by_state": {
+      "threshold": 0.1,
+      "by_group": {
+        "CA": {
+          "n": 458,
+          "actual_default_rate": 0.0786,
+          "predicted_positive_rate": 0.1135,
+          "demographic_parity_ratio": 0.9032,
+          "false_positive_rate": 0.109,
+          "subgroup_auc": 0.5547
+        },
+        "IN": {
+          "n": 767,
+          "actual_default_rate": 0.0613,
+          "predicted_positive_rate": 0.1382,
+          "demographic_parity_ratio": 1.0994,
+          "false_positive_rate": 0.1181,
+          "subgroup_auc": 0.761
+        },
+        "MA": {
+          "n": 546,
+          "actual_default_rate": 0.0403,
+          "predicted_positive_rate": 0.1227,
+          "demographic_parity_ratio": 0.9762,
+          "false_positive_rate": 0.126,
+          "subgroup_auc": 0.6782
+        },
+        "MD": {
+          "n": 600,
+          "actual_default_rate": 0.01,
+          "predicted_positive_rate": 0.07,
+          "demographic_parity_ratio": 0.5568,
+          "false_positive_rate": 0.0707,
+          "subgroup_auc": 0.8872
+        },
+        "MI": {
+          "n": 617,
+          "actual_default_rate": 0.0389,
+          "predicted_positive_rate": 0.1653,
+          "demographic_parity_ratio": 1.3151,
+          "false_positive_rate": 0.1518,
+          "subgroup_auc": 0.7
+        },
+        "MO": {
+          "n": 563,
+          "actual_default_rate": 0.0142,
+          "predicted_positive_rate": 0.0746,
+          "demographic_parity_ratio": 0.5934,
+          "false_positive_rate": 0.0739,
+          "subgroup_auc": 0.5682
+        },
+        "NY": {
+          "n": 812,
+          "actual_default_rate": 0.0382,
+          "predicted_positive_rate": 0.0874,
+          "demographic_parity_ratio": 0.6956,
+          "false_positive_rate": 0.0832,
+          "subgroup_auc": 0.6347
+        },
+        "PA": {
+          "n": 571,
+          "actual_default_rate": 0.063,
+          "predicted_positive_rate": 0.0788,
+          "demographic_parity_ratio": 0.6269,
+          "false_positive_rate": 0.0673,
+          "subgroup_auc": 0.5639
+        },
+        "TX": {
+          "n": 419,
+          "actual_default_rate": 0.0286,
+          "predicted_positive_rate": 0.3341,
+          "demographic_parity_ratio": 2.658,
+          "false_positive_rate": 0.3145,
+          "subgroup_auc": 0.9151
+        },
+        "WA": {
+          "n": 478,
+          "actual_default_rate": 0.0502,
+          "predicted_positive_rate": 0.1381,
+          "demographic_parity_ratio": 1.0984,
+          "false_positive_rate": 0.1189,
+          "subgroup_auc": 0.765
+        }
+      },
+      "four_fifths_rule": {
+        "description": "Demographic parity ratio between 0.80 and 1.25 across groups is the standard US fair-lending threshold.",
+        "min_ratio_observed": 0.5568,
+        "passes": false
+      }
+    }
+  }
+}
