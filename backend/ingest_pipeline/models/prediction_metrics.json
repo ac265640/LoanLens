@@ -1,0 +1,37 @@
+{
+  "next_3m_delinquency_flag": {
+    "roc_auc": 0.8078,
+    "pr_auc": 0.4255,
+    "brier": 0.0288,
+    "f1": 0.457
+  },
+  "next_6m_delinquency_flag": {
+    "roc_auc": 0.7628,
+    "pr_auc": 0.3556,
+    "brier": 0.0492,
+    "f1": 0.3338
+  },
+  "next_12m_default_flag": {
+    "roc_auc": 0.6751,
+    "pr_auc": 0.0853,
+    "brier": 0.0444,
+    "f1": 0.0
+  },
+  "next_12m_prepayment_flag": {
+    "roc_auc": 0.616,
+    "pr_auc": 0.0593,
+    "brier": 0.045,
+    "f1": 0.0
+  },
+  "next_state": {
+    "macro_f1": 0.5236,
+    "classes": [
+      "30-59 DPD",
+      "60-89 DPD",
+      "90+ DPD",
+      "Current",
+      "Default",
+      "Prepaid"
+    ]
+  }
+}
