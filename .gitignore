@@ -11,3 +11,8 @@ build/
 frontend/node_modules/
 frontend/.env
 *.log
+
+# Regenerable via training/generate_data.py + training/train_*.py —
+# not committed to keep the repo lean; data/sample/ holds the small
+# curated demo tape used by the ingestion demo, which IS committed.
+data/raw/
