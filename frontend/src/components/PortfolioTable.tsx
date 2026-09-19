@@ -12,8 +12,8 @@ export default function PortfolioTable({
 }) {
   return (
     <div className="glass overflow-hidden rounded-2xl">
-      <div className="max-h-[560px] overflow-y-auto">
-        <table className="w-full text-left text-sm">
+      <div className="max-h-[560px] overflow-auto">
+        <table className="w-full min-w-[760px] text-left text-sm">
           <thead className="sticky top-0 z-10" style={{ background: "var(--bg-panel-2)" }}>
             <tr style={{ color: "var(--text-dim)" }}>
               <th className="px-4 py-3 font-medium">Loan ID</th>
@@ -73,7 +73,7 @@ export default function PortfolioTable({
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-xs" style={{ color: "var(--text-dim)" }}>
+                <td className="max-w-[220px] px-4 py-3 text-xs" style={{ color: "var(--text-dim)" }}>
                   {loan.recommended_action}
                 </td>
               </tr>

@@ -20,6 +20,8 @@ export interface Loan {
   days_past_due: number;
   current_balance: number;
   credit_score_band: string;
+  ltv_band?: string | null;
+  dti_band?: string | null;
   prob_next_3m_delinquency: number;
   prob_next_6m_delinquency: number;
   prob_next_12m_default: number;
@@ -99,10 +101,20 @@ export interface CedarResult {
   determining_policies: string[];
 }
 
+// Cedar has no floating point, so policies compare integer percentages. The
+// tape only carries an LTV *band*; use the band's upper bound (the
+// conservative reading) as the loan's LTV.
+export function ltvPct(band?: string | null): number {
+  if (!band) return 0;
+  const nums = (band.match(/\d+/g) ?? []).map(Number);
+  if (band.startsWith(">")) return 100;
+  return nums.length ? Math.max(...nums) : 0;
+}
+
 export function cedarAuthorize(userId: string, role: string, action: string, loan: Loan) {
   return request<CedarResult>("/cedar/authorize", {
     method: "POST",
-    body: JSON.stringify({ userId, role, action, loan }),
+    body: JSON.stringify({ userId, role, action, loan: { ...loan, ltv_pct: ltvPct(loan.ltv_band) } }),
   });
 }
 

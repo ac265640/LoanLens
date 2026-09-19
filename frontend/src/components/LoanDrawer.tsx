@@ -1,9 +1,10 @@
 import { useState } from "react";
 import type { Loan, CedarResult } from "../api";
-import { cedarAuthorize, copilotMemo } from "../api";
+import { cedarAuthorize, copilotMemo, ltvPct } from "../api";
 import RiskBadge from "./RiskBadge";
 
 const ROLES = ["JuniorUnderwriter", "SeniorUnderwriter", "RiskCommittee"];
+const ACTIONS = ["ApproveLoan", "OverrideAnomaly"];
 
 const DRIVER_LABELS: Record<string, string> = {
   days_past_due: "Days Past Due",
@@ -16,6 +17,7 @@ const DRIVER_LABELS: Record<string, string> = {
 
 export default function LoanDrawer({ loan, onClose }: { loan: Loan; onClose: () => void }) {
   const [role, setRole] = useState("JuniorUnderwriter");
+  const [action, setAction] = useState("ApproveLoan");
   const [cedarResult, setCedarResult] = useState<CedarResult | null>(null);
   const [cedarLoading, setCedarLoading] = useState(false);
   const [memo, setMemo] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export default function LoanDrawer({ loan, onClose }: { loan: Loan; onClose: () 
     setCedarLoading(true);
     setCedarResult(null);
     try {
-      const r = await cedarAuthorize("demo-user", role, "ApproveLoan", loan);
+      const r = await cedarAuthorize("demo-user", role, action, loan);
       setCedarResult(r);
     } catch (e) {
       setCedarResult({ decision: "deny", determining_policies: [e instanceof Error ? e.message : "error"] });
@@ -121,9 +123,30 @@ export default function LoanDrawer({ loan, onClose }: { loan: Loan; onClose: () 
               className="rounded-lg px-3 py-1.5 text-xs font-medium"
               style={{ background: "var(--accent)", color: "#0a0d14" }}
             >
-              {cedarLoading ? "Evaluating…" : "Check ApproveLoan authorization"}
+              {cedarLoading ? "Evaluating…" : `Check ${action}`}
             </button>
           </div>
+          <div className="mt-2">
+            <select
+              value={action}
+              onChange={(e) => {
+                setAction(e.target.value);
+                setCedarResult(null);
+              }}
+              className="rounded-lg border px-2 py-1.5 text-xs"
+              style={{ background: "var(--bg-panel-2)", borderColor: "var(--border)", color: "var(--text)" }}
+            >
+              {ACTIONS.map((a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+            </select>
+          </div>
+          <p className="mt-2 text-[11px]" style={{ color: "var(--text-dim)" }}>
+            Policy inputs: risk {(loan.prob_next_12m_default * 100).toFixed(0)}% · LTV ≤ {ltvPct(loan.ltv_band)}% · exception flag{" "}
+            {loan.exception_required === 1 ? "yes" : "no"}
+          </p>
           {cedarResult && (
             <div
               className="mt-2 rounded-lg px-3 py-2 text-xs"

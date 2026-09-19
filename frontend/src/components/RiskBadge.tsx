@@ -8,7 +8,7 @@ export default function RiskBadge({ prob }: { prob: number }) {
   const t = riskTier(prob);
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
+      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium"
       style={{ color: t.color, background: t.bg }}
     >
       <span className="h-1.5 w-1.5 rounded-full" style={{ background: t.color }} />
