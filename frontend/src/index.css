@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
-:root {
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
   --bg: #0a0d14;
   --bg-panel: #11151f;
   --bg-panel-2: #161b28;
@@ -12,6 +14,21 @@
   --emerald: #34d399;
   --amber: #fbbf24;
   --crimson: #f87171;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f5f6f8;
+  --bg-panel: #ffffff;
+  --bg-panel-2: #eef1f6;
+  --border: #dfe3e8;
+  --text: #101820;
+  --text-dim: #5b6673;
+  --accent: #4361ee;
+  --accent-glow: rgba(67, 97, 238, 0.15);
+  --emerald: #059669;
+  --amber: #d97706;
+  --crimson: #dc2626;
 }
 
 * {
@@ -27,6 +44,7 @@ body {
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
   margin: 0;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 ::-webkit-scrollbar {
@@ -42,6 +60,21 @@ body {
   background: linear-gradient(180deg, rgba(22, 27, 40, 0.85), rgba(17, 21, 31, 0.85));
   border: 1px solid var(--border);
   backdrop-filter: blur(12px);
+}
+
+[data-theme='light'] .glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95));
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='light'] [style*="color: #0a0d14"],
+[data-theme='light'] [style*="color: rgb(10, 13, 20)"] {
+  color: #ffffff !important;
+}
+
+[data-theme='light'] tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .glow-border {
