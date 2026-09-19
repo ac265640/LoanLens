@@ -121,6 +121,8 @@ def score_loan_tape(df: pd.DataFrame) -> pd.DataFrame:
         "days_past_due": feat_df["days_past_due"],
         "current_balance": feat_df["current_balance"],
         "credit_score_band": feat_df.get("credit_score_band", ""),
+        "ltv_band": feat_df.get("ltv_band", ""),
+        "dti_band": feat_df.get("dti_band", ""),
         "prob_next_3m_delinquency": np.round(prob_dict["next_3m_delinquency_flag"], 4),
         "prob_next_6m_delinquency": np.round(prob_dict["next_6m_delinquency_flag"], 4),
         "prob_next_12m_default": np.round(prob_dict["next_12m_default_flag"], 4),
@@ -181,6 +183,28 @@ def _write_to_dynamodb(scored: pd.DataFrame, run_id: str) -> dict:
     }
 
 
+def _stale_loan_ids(items: list, run_id: str) -> list:
+    return [i["loan_id"] for i in items if i.get("run_id") != run_id]
+
+
+def _delete_stale_loans(table, run_id: str) -> int:
+    """A tape is a snapshot of the portfolio. Loans that were in an earlier tape
+    but are absent from this one (paid off, sold) must not linger and inflate
+    the totals, so anything not written by this run is removed."""
+    stale, kwargs = [], {"ProjectionExpression": "loan_id, #r", "ExpressionAttributeNames": {"#r": "run_id"}}
+    while True:
+        page = table.scan(**kwargs)
+        stale += _stale_loan_ids(page.get("Items", []), run_id)
+        if "LastEvaluatedKey" not in page:
+            break
+        kwargs["ExclusiveStartKey"] = page["LastEvaluatedKey"]
+
+    with table.batch_writer() as batch:
+        for loan_id in stale:
+            batch.delete_item(Key={"loan_id": loan_id})
+    return len(stale)
+
+
 def handler(event, context):
     """
     event: { "bucket": "...", "key": "raw/tape.csv", "run_id": "..." }
@@ -205,6 +229,7 @@ def handler(event, context):
 
         scored = score_loan_tape(df)
         counts = _write_to_dynamodb(scored, run_id)
+        counts["stale_removed"] = _delete_stale_loans(dynamodb.Table(TABLE_NAME), run_id)
     except Exception as e:
         # Record the failure so the dashboard can show it instead of polling
         # forever, then re-raise so Step Functions still marks the run failed.
@@ -224,6 +249,7 @@ def handler(event, context):
         "loans_scored": counts["total"],
         "high_risk_count": counts["high_risk"],
         "exception_count": counts["exceptions"],
+        "stale_removed": counts["stale_removed"],
         "completed_at": datetime.now(timezone.utc).isoformat(),
     })
 

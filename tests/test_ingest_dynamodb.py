@@ -76,3 +76,57 @@ def test_every_item_from_the_real_demo_tape_serializes():
     for row in scored.to_dict(orient="records"):
         item = handler._to_dynamo_item(row, run_id="raw_demo", scored_at="2026-01-01T00:00:00+00:00")
         serializer.serialize(item)  # raises TypeError on any float / NaN left behind
+
+
+class _FakeTable:
+    """Minimal stand-in for a DynamoDB Table: paginated scan + batch deletes."""
+
+    def __init__(self, pages):
+        self._pages = list(pages)
+        self.deleted = []
+
+    def scan(self, **kwargs):
+        page = self._pages.pop(0)
+        result = {"Items": page}
+        if self._pages:
+            result["LastEvaluatedKey"] = {"loan_id": page[-1]["loan_id"]}
+        return result
+
+    def batch_writer(self):
+        table = self
+
+        class _Batch:
+            def __enter__(self_inner):
+                return self_inner
+
+            def __exit__(self_inner, *exc):
+                return False
+
+            def delete_item(self_inner, Key):
+                table.deleted.append(Key["loan_id"])
+
+        return _Batch()
+
+
+def test_stale_loans_are_those_from_other_runs():
+    items = [
+        {"loan_id": "A", "run_id": "new"},
+        {"loan_id": "B", "run_id": "old"},
+        {"loan_id": "C"},  # written before run ids existed
+    ]
+    assert handler._stale_loan_ids(items, "new") == ["B", "C"]
+
+
+def test_delete_stale_walks_every_scan_page():
+    table = _FakeTable([
+        [{"loan_id": "A", "run_id": "new"}, {"loan_id": "B", "run_id": "old"}],
+        [{"loan_id": "C", "run_id": "old"}, {"loan_id": "D", "run_id": "new"}],
+    ])
+    assert handler._delete_stale_loans(table, "new") == 2
+    assert table.deleted == ["B", "C"]
+
+
+def test_delete_stale_removes_nothing_when_all_current():
+    table = _FakeTable([[{"loan_id": "A", "run_id": "new"}]])
+    assert handler._delete_stale_loans(table, "new") == 0
+    assert table.deleted == []
