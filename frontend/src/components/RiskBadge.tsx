@@ -1,7 +1,7 @@
 export function riskTier(prob: number): { label: string; color: string; bg: string } {
-  if (prob >= 0.2) return { label: "High Risk", color: "#f87171", bg: "rgba(248,113,113,0.12)" };
-  if (prob >= 0.08) return { label: "Watch-list", color: "#fbbf24", bg: "rgba(251,191,36,0.12)" };
-  return { label: "Healthy", color: "#34d399", bg: "rgba(52,211,153,0.12)" };
+  if (prob >= 0.2) return { label: "High Risk", color: "var(--crimson)", bg: "color-mix(in srgb, var(--crimson) 12%, transparent)" };
+  if (prob >= 0.08) return { label: "Watch-list", color: "var(--amber)", bg: "color-mix(in srgb, var(--amber) 12%, transparent)" };
+  return { label: "Healthy", color: "var(--emerald)", bg: "color-mix(in srgb, var(--emerald) 12%, transparent)" };
 }
 
 export default function RiskBadge({ prob }: { prob: number }) {
