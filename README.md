@@ -11,6 +11,23 @@ anomaly/exception detection, an interactive macro stress simulator, a Bedrock-gr
 reviewer copilot, and a Cedar policy-as-code governance gate — all serverless, all on AWS,
 built for the WeMakeDevs × AWS "First Commit" hackathon (Bharat Builds Tour).
 
+## Live demo
+
+- **Dashboard:** https://main.d3uibhd8oe3ebl.amplifyapp.com
+- **API:** `https://kwazm9gei8.execute-api.us-east-1.amazonaws.com/prod` (try `GET /loans`)
+
+To see it work end to end:
+
+1. Open the dashboard, then drop `data/sample/demo_loan_tape.csv` on the upload area. That
+   uploads to S3, EventBridge starts a Step Functions run, and a container Lambda scores
+   every loan into DynamoDB. The table refreshes when the run completes.
+2. Open the **High Risk** tab and click a loan. In the *Cedar Policy Compliance Gate*, run
+   `ApproveLoan` as each role: the 41% loan is denied to a Junior Underwriter and allowed to a
+   Senior Underwriter or the Risk Committee. On an **Exceptions** loan, run `OverrideAnomaly`:
+   only the Risk Committee may override a flagged loan.
+3. Move the **Shockwave** sliders (rate and unemployment shock) for live expected loss,
+   capital impact and VaR.
+
 ## Why this architecture
 
 Everything here is **serverless and scales to zero** — no idle EC2, no SageMaker endpoint,
@@ -98,15 +115,18 @@ specifically for this hackathon:
 - **S3** — loan tape uploads (`raw/` prefix triggers the pipeline)
 - **EventBridge** — S3 object-created events routed to Step Functions
 - **Step Functions** — orchestrates the ingest pipeline
-- **Lambda** — ingest pipeline (container image, ~13MB of trained model artifacts +
-  pandas/lightgbm/scikit-learn), Cedar gate (Node.js), Bedrock copilot (Python), stress
-  query (Python), portfolio read API (Python)
+- **Lambda** — ingest pipeline (arm64 container image, Python 3.12, ~13MB of trained model
+  artifacts + pandas/lightgbm/scikit-learn), Cedar gate (Node.js 22), Bedrock copilot
+  (Python), stress query (Python), portfolio read API (Python)
 - **DynamoDB** — `loanlens-loans`, `loanlens-runs`, `loanlens-copilot-audit` (all
   on-demand billing)
 - **API Gateway** — REST API fronting all Lambdas
-- **Amazon Bedrock** — reviewer copilot (default: Amazon Nova Lite; swap
-  `BedrockModelId` in `infra/template.yaml` for an Anthropic model once access is granted)
-- **Amplify Hosting** — the React dashboard
+- **Amazon Bedrock** — reviewer copilot (default: Amazon Nova Lite; change the
+  `BedrockModelId` parameter for another model). If the model can't be reached, the API
+  returns `fallback: true` and the UI labels the answer as a template instead of presenting
+  it as model output
+- **Amplify Hosting** — the React dashboard (`scripts/deploy_frontend.sh`)
+- **CloudWatch Logs** — per-function log groups with 7-day retention
 
 ## AWS Cedar
 
@@ -115,7 +135,9 @@ policies — e.g. a Junior Underwriter may approve a loan only when risk and LTV
 bounds; nobody below the Risk Committee may override a fraud-flagged anomaly. Evaluated
 via the official `@cedar-policy/cedar-wasm` engine (not a lookalike — verified against the
 real AWS Cedar semantics, including `when`/`unless` clauses). Every loan approval or
-override action in the UI runs through this gate live.
+override action in the UI runs through this gate live. Cedar has no floating point, so
+policies compare integer percentages: risk is the 12M default probability x 100, and LTV is
+the upper bound of the loan's LTV band (the conservative reading).
 
 ## Setup
 
@@ -127,18 +149,32 @@ make setup            # creates .venv, installs training/requirements.txt
 make run-all           # generate -> train -> analyze -> test, ~60-90s
 # (see the Makefile for the individual targets this chains together)
 
-# 2. Backend
-cd infra
-sam build
-sam deploy --guided   # first time only; writes samconfig.toml
+# 2. Backend (needs Docker running, and AWS credentials via `aws configure`)
+make deploy-backend    # sam build && sam deploy; deploy config is committed in infra/samconfig.toml
 
 # 3. Frontend
-cd ../frontend
-cp .env.example .env   # set VITE_API_URL to the ApiUrl output from sam deploy
-npm install
-npm run dev             # local dev
-# or: npm run build && push dist/ to Amplify Hosting
+make deploy-frontend   # builds against the stack's ApiUrl and publishes to Amplify Hosting
+# local dev instead:
+cd frontend && cp .env.example .env    # set VITE_API_URL to the ApiUrl stack output
+npm install && npm run dev
 ```
+
+The demo tape (`data/sample/demo_loan_tape.csv`) is an as-of snapshot built from the
+synthetic panel by `make demo-tape` (`scripts/build_demo_tape.py`).
+
+## Known limitations
+
+- The API has no authentication. It is a demo deployment over synthetic data, so every
+  endpoint, including tape upload, is open.
+- The Bedrock copilot needs Bedrock model access on the AWS account. Without it, answers are
+  clearly labeled template answers.
+- Everything is synthetic. Expected loss uses an illustrative 35% LGD, and the capital and
+  VaR figures use an illustrative capital base and a z-score approximation (not a live Monte
+  Carlo); the UI says so next to the numbers.
+- Models are trained on a 5,000-loan portfolio, so the absolute AUCs (0.62 to 0.81 across
+  targets, see `backend/ingest_pipeline/models/prediction_metrics.json`) are lower than a
+  full-scale run would give, and the per-segment fairness audit is noisy at this size.
+- A tape replaces the portfolio snapshot: loans absent from the newest tape are removed.
 
 ## AI tools used during this hackathon
 

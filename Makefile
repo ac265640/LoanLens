@@ -1,4 +1,4 @@
-.PHONY: setup generate train-prediction train-anomaly survival profile explain scenarios counterfactuals conformal stress-grid test cedar-test train-all run-all clean
+.PHONY: demo-tape deploy-backend deploy-frontend setup generate train-prediction train-anomaly survival profile explain scenarios counterfactuals conformal stress-grid test cedar-test train-all run-all clean
 
 VENV_PY ?= python3
 
@@ -35,6 +35,15 @@ conformal:
 
 stress-grid:
 	$(VENV_PY) scripts/precompute_stress_grid.py
+
+demo-tape:
+	$(VENV_PY) scripts/build_demo_tape.py
+
+deploy-backend:
+	cd infra && sam build && sam deploy
+
+deploy-frontend:
+	scripts/deploy_frontend.sh
 
 test:
 	$(VENV_PY) -m pytest tests/ -v
