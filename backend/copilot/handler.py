@@ -50,7 +50,8 @@ def _decimalize(obj):
 
 def _floatify(obj):
     if isinstance(obj, Decimal):
-        return float(obj)
+        # whole numbers stay ints (344, not 344.0); DynamoDB returns every number as Decimal
+        return int(obj) if obj == obj.to_integral_value() else float(obj)
     if isinstance(obj, dict):
         return {k: _floatify(v) for k, v in obj.items()}
     if isinstance(obj, list):
