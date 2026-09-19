@@ -8,3 +8,4 @@ pytest>=8.0.0
 shap>=0.49.0
 lifelines>=0.30.0
 statsmodels>=0.14.0
+boto3>=1.34.0

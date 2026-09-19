@@ -11,9 +11,11 @@ to DynamoDB so the dashboard updates without a page reload.
 import io
 import json
 import logging
+import math
 import os
 import time
 from datetime import datetime, timezone
+from decimal import Decimal
 from pathlib import Path
 
 import boto3
@@ -138,32 +140,45 @@ def score_loan_tape(df: pd.DataFrame) -> pd.DataFrame:
     return result.sort_values("reporting_month").groupby("loan_id").last().reset_index()
 
 
+def _to_dynamo_value(v):
+    """boto3's DynamoDB layer rejects Python floats (needs Decimal) and NaN/Inf
+    (unrepresentable). Missing values, e.g. an absent credit score band that
+    pandas holds as NaN, are stored as NULL."""
+    if v is None:
+        return None
+    if isinstance(v, (float, np.floating)):
+        f = float(v)
+        if math.isnan(f) or math.isinf(f):
+            return None
+        return Decimal(str(round(f, 4)))
+    if isinstance(v, (bool, np.bool_)):
+        return bool(v)
+    if isinstance(v, (int, np.integer)):
+        return int(v)
+    return v
+
+
+def _to_dynamo_item(row: dict, run_id: str, scored_at: str) -> dict:
+    item = {k: _to_dynamo_value(v) for k, v in row.items()}
+    item["loan_id"] = str(item["loan_id"])
+    item["run_id"] = run_id
+    item["scored_at"] = scored_at
+    return item
+
+
 def _write_to_dynamodb(scored: pd.DataFrame, run_id: str) -> dict:
     table = dynamodb.Table(TABLE_NAME)
     now = datetime.now(timezone.utc).isoformat()
-    counts = {"total": 0, "high_risk": 0, "exceptions": 0}
 
     with table.batch_writer(overwrite_by_pkeys=["loan_id"]) as batch:
-        for _, row in scored.iterrows():
-            item = row.to_dict()
-            item["loan_id"] = str(item["loan_id"])
-            item["scored_at"] = now
-            item["run_id"] = run_id
-            for k, v in item.items():
-                if isinstance(v, (np.floating,)):
-                    item[k] = round(float(v), 4)
-                elif isinstance(v, (np.integer,)):
-                    item[k] = int(v)
-                elif isinstance(v, float):
-                    item[k] = round(v, 4)
-            batch.put_item(Item=item)
-            counts["total"] += 1
-            if item["prob_next_12m_default"] >= 0.20:
-                counts["high_risk"] += 1
-            if item["exception_required"] == 1:
-                counts["exceptions"] += 1
+        for row in scored.to_dict(orient="records"):
+            batch.put_item(Item=_to_dynamo_item(row, run_id, now))
 
-    return counts
+    return {
+        "total": int(len(scored)),
+        "high_risk": int((scored["prob_next_12m_default"] >= 0.20).sum()),
+        "exceptions": int((scored["exception_required"] == 1).sum()),
+    }
 
 
 def handler(event, context):
@@ -180,15 +195,28 @@ def handler(event, context):
         default_run_id = default_run_id[: -len(".csv")]
     run_id = event.get("run_id") or default_run_id
 
-    log.info(f"Scoring loan tape s3://{bucket}/{key} (run_id={run_id})")
-    obj = s3.get_object(Bucket=bucket, Key=key)
-    df = pd.read_csv(io.BytesIO(obj["Body"].read()))
-    log.info(f"Loaded {len(df):,} rows across {df['loan_id'].nunique():,} loans")
-
-    scored = score_loan_tape(df)
-    counts = _write_to_dynamodb(scored, run_id)
-
     runs_table = dynamodb.Table(RUNS_TABLE_NAME)
+
+    try:
+        log.info(f"Scoring loan tape s3://{bucket}/{key} (run_id={run_id})")
+        obj = s3.get_object(Bucket=bucket, Key=key)
+        df = pd.read_csv(io.BytesIO(obj["Body"].read()))
+        log.info(f"Loaded {len(df):,} rows across {df['loan_id'].nunique():,} loans")
+
+        scored = score_loan_tape(df)
+        counts = _write_to_dynamodb(scored, run_id)
+    except Exception as e:
+        # Record the failure so the dashboard can show it instead of polling
+        # forever, then re-raise so Step Functions still marks the run failed.
+        runs_table.put_item(Item={
+            "run_id": run_id,
+            "status": "FAILED",
+            "source_key": key,
+            "error": f"{type(e).__name__}: {e}"[:500],
+            "failed_at": datetime.now(timezone.utc).isoformat(),
+        })
+        raise
+
     runs_table.put_item(Item={
         "run_id": run_id,
         "status": "COMPLETE",
