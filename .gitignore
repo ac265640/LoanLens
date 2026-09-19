@@ -19,3 +19,15 @@ data/raw/
 
 # Local tooling config, not part of the project itself
 .claude/
+
+# Secrets and local environment. Never commit these. AWS credentials live in
+# ~/.aws/credentials (`aws configure`) or AWS_* environment variables, not here.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.csv
+*_accessKeys.csv
+rootkey.csv
+.aws/
