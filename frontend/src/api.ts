@@ -48,7 +48,7 @@ export function listLoans(params: Record<string, string> = {}) {
 }
 
 export function getRun(runId: string) {
-  return request<{ run_id: string; status: string; loans_scored?: number; high_risk_count?: number; exception_count?: number }>(
+  return request<{ run_id: string; status: string; loans_scored?: number; high_risk_count?: number; exception_count?: number; error?: string }>(
     `/runs/${runId}`
   );
 }

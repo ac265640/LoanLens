@@ -31,6 +31,11 @@ export default function UploadDropzone({ onComplete }: { onComplete: () => void 
         attempts += 1;
         try {
           const run = await getRun(runId);
+          if (run.status === "FAILED") {
+            setPhase("error");
+            setMessage(`Pipeline failed: ${run.error ?? "unknown error"}`);
+            return;
+          }
           if (run.status === "COMPLETE") {
             setPhase("done");
             setMessage(
