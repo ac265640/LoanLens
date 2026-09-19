@@ -78,9 +78,9 @@ Resources:
     Properties:
       FunctionName: loanlens-ingest-pipeline
       PackageType: Image
+      Architectures: [arm64]
       Timeout: 120
       MemorySize: 1536
-      ImageUri: !Sub "${IngestPipelineRepo}:latest"
       Policies:
         - S3ReadPolicy:
             BucketName: !Ref LoanTapesBucket
@@ -92,11 +92,6 @@ Resources:
       DockerTag: latest
       DockerContext: ../backend/ingest_pipeline
       Dockerfile: Dockerfile
-
-  IngestPipelineRepo:
-    Type: AWS::ECR::Repository
-    Properties:
-      RepositoryName: loanlens-ingest-pipeline
 
   # ---------- Cedar policy gate (Node.js, cedar-wasm) ----------
   CedarGateFunction:
