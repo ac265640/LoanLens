@@ -40,11 +40,33 @@ def _respond(status, body):
     }
 
 
-def list_loans(params: dict):
-    table = dynamodb.Table(LOANS_TABLE)
-    resp = table.scan(Limit=1000)
-    items = [_floatify(i) for i in resp.get("Items", [])]
+def _scan_all(table) -> list:
+    """Read every item; a single scan call returns at most 1 MB."""
+    items, kwargs = [], {}
+    while True:
+        page = table.scan(**kwargs)
+        items += page.get("Items", [])
+        if "LastEvaluatedKey" not in page:
+            return items
+        kwargs["ExclusiveStartKey"] = page["LastEvaluatedKey"]
 
+
+def _summarize(items: list) -> dict:
+    return {
+        "total_loans": len(items),
+        "high_risk_count": sum(1 for i in items if i.get("prob_next_12m_default", 0) >= 0.20),
+        "exception_count": sum(1 for i in items if i.get("exception_required") == 1),
+        "total_exposure_usd": round(sum(i.get("current_balance", 0) for i in items), 2),
+    }
+
+
+def list_loans(params: dict):
+    all_items = [_floatify(i) for i in _scan_all(dynamodb.Table(LOANS_TABLE))]
+
+    # The summary always describes the whole portfolio; filters only narrow the table.
+    summary = _summarize(all_items)
+
+    items = all_items
     status_filter = params.get("status")
     min_default = params.get("min_default_prob")
     exceptions_only = params.get("exceptions_only")
@@ -57,13 +79,6 @@ def list_loans(params: dict):
         items = [i for i in items if i.get("exception_required") == 1]
 
     items.sort(key=lambda i: i.get("prob_next_12m_default", 0), reverse=True)
-
-    summary = {
-        "total_loans": len(items),
-        "high_risk_count": sum(1 for i in items if i.get("prob_next_12m_default", 0) >= 0.20),
-        "exception_count": sum(1 for i in items if i.get("exception_required") == 1),
-        "total_exposure_usd": round(sum(i.get("current_balance", 0) for i in items), 2),
-    }
 
     return _respond(200, {"summary": summary, "loans": items[:500]})
 
