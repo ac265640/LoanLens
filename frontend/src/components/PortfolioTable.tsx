@@ -25,8 +25,8 @@ export default function PortfolioTable({
               <th className="px-4 py-3 font-medium">Action</th>
             </tr>
           </thead>
-          <tbody>
-            {loading && (
+          <tbody style={{ opacity: loading ? 0.5 : 1, transition: "opacity 150ms" }}>
+            {loading && loans.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-10 text-center animate-pulse-soft" style={{ color: "var(--text-dim)" }}>
                   Loading portfolio…
