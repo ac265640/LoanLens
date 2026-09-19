@@ -211,9 +211,11 @@ def handler(event, context_):
         return _respond(400, {"error": f"unknown mode {mode}"})
 
     model_name = "deterministic-grounded-fallback"
+    fallback_reason = None
     try:
         output, model_name = _invoke_bedrock(prompt)
     except Exception as e:
+        fallback_reason = f"{type(e).__name__}: {e}"[:300]
         log.warning(f"Bedrock call failed ({e}); using deterministic grounded fallback.")
         output = _deterministic_fallback(mode, ctx if mode != "portfolio_qa" else {"n": ctx["n"]}, body.get("question", ""))
 
@@ -222,7 +224,14 @@ def handler(event, context_):
 
     _log_audit(mode, prompt, ctx, output, model_name)
 
-    return _respond(200, {"mode": mode, "model_name": model_name, "output": output, "disclaimer": DISCLAIMER})
+    return _respond(200, {
+        "mode": mode,
+        "model_name": model_name,
+        "fallback": fallback_reason is not None,
+        "fallback_reason": fallback_reason,
+        "output": output,
+        "disclaimer": DISCLAIMER,
+    })
 
 
 def _respond(status, body):

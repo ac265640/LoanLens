@@ -5,6 +5,7 @@ interface Message {
   role: "user" | "assistant";
   text: string;
   model?: string;
+  fallback?: boolean;
 }
 
 const SUGGESTIONS = [
@@ -25,7 +26,7 @@ export default function CopilotChat() {
     setLoading(true);
     try {
       const r = await copilotAsk(question);
-      setMessages((m) => [...m, { role: "assistant", text: r.output, model: r.model_name }]);
+      setMessages((m) => [...m, { role: "assistant", text: r.output, model: r.model_name, fallback: r.fallback }]);
     } catch (e) {
       setMessages((m) => [...m, { role: "assistant", text: e instanceof Error ? e.message : "Something went wrong." }]);
     } finally {
@@ -68,6 +69,11 @@ export default function CopilotChat() {
             }}
           >
             {m.text}
+            {m.role === "assistant" && m.model && (
+              <p className="mt-2 text-[10px]" style={{ color: m.fallback ? "var(--amber)" : "var(--text-dim)" }}>
+                {m.fallback ? "Template answer — the Bedrock model could not be reached" : `Answered by ${m.model}`}
+              </p>
+            )}
           </div>
         ))}
         {loading && (

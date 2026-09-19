@@ -41,7 +41,7 @@ export default function LoanDrawer({ loan, onClose }: { loan: Loan; onClose: () 
     try {
       const r = await copilotMemo(loan.loan_id);
       setMemo(r.output);
-      setMemoModel(r.model_name);
+      setMemoModel(r.fallback ? "Template answer — the Bedrock model could not be reached" : `Answered by ${r.model_name}`);
     } catch (e) {
       setMemo(e instanceof Error ? e.message : "Memo generation failed.");
     } finally {

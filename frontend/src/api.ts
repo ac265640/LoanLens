@@ -109,6 +109,8 @@ export function cedarAuthorize(userId: string, role: string, action: string, loa
 export interface CopilotResult {
   mode: string;
   model_name: string;
+  fallback?: boolean;
+  fallback_reason?: string | null;
   output: string;
   disclaimer: string;
 }
