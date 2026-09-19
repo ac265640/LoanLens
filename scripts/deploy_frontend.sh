@@ -8,11 +8,16 @@
 # Env overrides: AWS_REGION, STACK_NAME, AMPLIFY_APP_NAME, AMPLIFY_BRANCH
 set -euo pipefail
 
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Optional overrides (see .env.example). AWS credentials are never read from
+# here; the AWS CLI takes them from ~/.aws/credentials or AWS_* variables.
+if [ -f "$ROOT/.env" ]; then set -a; . "$ROOT/.env"; set +a; fi
+
 REGION="${AWS_REGION:-us-east-1}"
 STACK="${STACK_NAME:-loanlens}"
 APP_NAME="${AMPLIFY_APP_NAME:-loanlens}"
 BRANCH="${AMPLIFY_BRANCH:-main}"
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 API_URL="$(aws cloudformation describe-stacks --stack-name "$STACK" --region "$REGION" \
   --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue" --output text)"
