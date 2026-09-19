@@ -35,38 +35,21 @@ export default function App() {
   }, [refresh]);
 
   return (
-    <div className="min-h-screen px-4 py-6 sm:px-8">
-      <header className="mx-auto mb-6 flex max-w-7xl flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg glow-border" style={{ background: "var(--accent-glow)" }}>
-              <span className="text-sm font-bold" style={{ color: "var(--accent)" }}>
-                L
-              </span>
-            </div>
-            <h1 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
-              LoanLens
-            </h1>
-          </div>
-          <p className="mt-0.5 text-xs" style={{ color: "var(--text-dim)" }}>
-            Autonomous Credit Underwriting & Portfolio Risk Intelligence — built on AWS
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <SummaryChip label="Loans Scored" value={summary?.total_loans ?? "—"} />
-          <SummaryChip label="High Risk" value={summary?.high_risk_count ?? "—"} accent="var(--crimson)" />
-          <SummaryChip label="Exceptions" value={summary?.exception_count ?? "—"} accent="var(--amber)" />
-          <SummaryChip
-            label="Total Exposure"
-            value={summary ? `$${(summary.total_exposure_usd / 1e6).toFixed(1)}M` : "—"}
-            accent="var(--emerald)"
-          />
-        </div>
-      </header>
-
+    <div className="min-h-screen px-4 pt-24 pb-6 sm:px-8 sm:pt-28">
       <main className="mx-auto grid max-w-7xl grid-cols-1 gap-5 lg:grid-cols-3">
         <div className="space-y-5 lg:col-span-2">
+          {/* On mobile screens, show summary chips at the top */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:hidden">
+            <SummaryChip label="Loans Scored" value={summary?.total_loans ?? "—"} />
+            <SummaryChip label="High Risk" value={summary?.high_risk_count ?? "—"} accent="var(--crimson)" />
+            <SummaryChip label="Exceptions" value={summary?.exception_count ?? "—"} accent="var(--amber)" />
+            <SummaryChip
+              label="Total Exposure"
+              value={summary ? `$${(summary.total_exposure_usd / 1e6).toFixed(1)}M` : "—"}
+              accent="var(--emerald)"
+            />
+          </div>
+
           <UploadDropzone onComplete={refresh} />
 
           <div className="glass rounded-2xl p-1">
@@ -92,6 +75,18 @@ export default function App() {
         </div>
 
         <div className="space-y-5">
+          {/* On desktop, summary chips sit at the top of this column, aligned with UploadDropzone */}
+          <div className="hidden grid-cols-2 gap-3 lg:grid">
+            <SummaryChip label="Loans Scored" value={summary?.total_loans ?? "—"} />
+            <SummaryChip label="High Risk" value={summary?.high_risk_count ?? "—"} accent="var(--crimson)" />
+            <SummaryChip label="Exceptions" value={summary?.exception_count ?? "—"} accent="var(--amber)" />
+            <SummaryChip
+              label="Total Exposure"
+              value={summary ? `$${(summary.total_exposure_usd / 1e6).toFixed(1)}M` : "—"}
+              accent="var(--emerald)"
+            />
+          </div>
+
           <CopilotChat />
         </div>
       </main>
