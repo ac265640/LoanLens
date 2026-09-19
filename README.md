@@ -162,6 +162,8 @@ npm install && npm run dev
 The demo tape (`data/sample/demo_loan_tape.csv`) is an as-of snapshot built from the
 synthetic panel by `make demo-tape` (`scripts/build_demo_tape.py`).
 
+Working on the frontend or contributing: see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Known limitations
 
 - The API has no authentication. It is a demo deployment over synthetic data, so every
