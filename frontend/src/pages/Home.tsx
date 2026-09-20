@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ArchitectureDiagram from './ArchitectureDiagram';
 import HexBackground from './HexBackground';
+import FoldText from './FoldText';
 
 /* ------------------------------------------------------------------ */
 /* Hero visual: an illustrative 400-loan portfolio (20 x 20 dots).     */
@@ -20,6 +21,9 @@ const SAMPLE = new Set(Array.from({ length: 20 }, (_, k) => 11 + 19 * k));
 const CAUGHT = [...SAMPLE].filter((i) => HIGH_RISK_INDICES.has(i) || EXCEPTION_INDICES.has(i)).length;
 
 type Mode = 'sample' | 'all';
+
+const BRAND_SIZE = 'clamp(3rem, 6.5vw, 4.8rem)';
+const H1_SIZE = 'clamp(1.8rem, 3.8vw, 2.8rem)';
 
 export default function Home() {
     const [mode, setMode] = useState<Mode>('sample');
@@ -40,7 +44,7 @@ export default function Home() {
         return () => clearTimeout(t);
     }, []);
 
-    // Reveal-on-scroll, used only on the hero and the diagram.
+    // Reveal-on-scroll, used only on the hero viz and the diagram.
     useEffect(() => {
         const targets = rootRef.current?.querySelectorAll('.reveal-on-scroll');
         if (!targets || targets.length === 0) return;
@@ -79,12 +83,63 @@ export default function Home() {
             <HexBackground />
 
             {/* ---------------- hero ---------------- */}
-            <section className="hero reveal-on-scroll">
+            {/* reveal-on-scroll removed from the section: the fold is now the entrance.
+                It moved to the figure below so the dot grid still fades in. */}
+            <section className="hero">
                 <div className="hero-copy">
-                    <div className="hero-brand">
-                        Loan<span>Lens</span>
+                    <div className="hero-brand" role="img" aria-label="LoanLens">
+                        <FoldText
+                            text="Loan"
+                            splitBy="char"
+                            hinge="top"
+                            trigger="mount"
+                            duration={0.65}
+                            stagger={0.045}
+                            ease="power3.out"
+                            perspective={700}
+                            creaseShading={0.55}
+                            fontSize={BRAND_SIZE}
+                            fontWeight={800}
+                            color="var(--ink)"
+                            style={{ letterSpacing: '-0.035em', lineHeight: 1 }}
+                        />
+                        <FoldText
+                            text="Lens"
+                            splitBy="char"
+                            hinge="top"
+                            trigger="mount"
+                            delay={0.18}
+                            duration={0.65}
+                            stagger={0.045}
+                            ease="power3.out"
+                            perspective={700}
+                            creaseShading={0.55}
+                            fontSize={BRAND_SIZE}
+                            fontWeight={800}
+                            color="var(--scored)"
+                            style={{ letterSpacing: '-0.035em', lineHeight: 1 }}
+                        />
                     </div>
-                    <h1>Every loan scored, not just 5%.</h1>
+
+                    <h1>
+                        <FoldText
+                            text="Every loan scored, not just 5%."
+                            splitBy="word"
+                            hinge="top"
+                            trigger="mount"
+                            delay={0.35}
+                            duration={0.65}
+                            stagger={0.09}
+                            ease="power3.out"
+                            perspective={700}
+                            creaseShading={0.55}
+                            fontSize={H1_SIZE}
+                            fontWeight={700}
+                            color="var(--ink)"
+                            style={{ letterSpacing: '-0.02em', lineHeight: 1.08 }}
+                        />
+                    </h1>
+
                     <p>
                         Manual review often covers only a sample of each month's loan tape (5% in the example below), so most of the portfolio goes unreviewed.
                         LoanLens scores all of it on AWS: five risk predictions per loan, anomaly detection, live macro
@@ -100,7 +155,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                <figure className="hero-viz">
+                <figure className="hero-viz reveal-on-scroll">
                     <div className="seg" role="group" aria-label="Review method">
                         <button type="button" aria-pressed={mode === 'sample'} onClick={() => choose('sample')}>
                             5% sample
@@ -338,7 +393,7 @@ export default function Home() {
                 </p>
                 <div className="hero-actions">
                     <Link to="/dashboard" className="btn primary">
-                        Open the dashboard
+                        Go to Live Platform
                     </Link>
                 </div>
             </section>
