@@ -31,3 +31,4 @@ credentials.csv
 *_accessKeys.csv
 rootkey.csv
 .aws/
+*.tsbuildinfo
