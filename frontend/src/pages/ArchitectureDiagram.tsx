@@ -45,7 +45,7 @@ const STATIONS: Station[] = [
     { id: 'api', x: 590, y: 310, kind: 'api', title: 'API Gateway', lines: ['REST'], step: 7 },
     { id: 'ui', x: 400, y: 310, kind: 'ui', title: 'React + Vite', lines: ['Amplify Hosting'], step: 8 },
     // side lanes that feed the API
-    { id: 'br', x: 470, y: 540, kind: 'ai', title: 'Bedrock', lines: ['Nova Lite / Claude', 'reviewer copilot'] },
+    { id: 'br', x: 470, y: 540, kind: 'ai', title: 'Bedrock', lines: ['Nova Lite', 'reviewer copilot'] },
     { id: 'cedar', x: 710, y: 540, kind: 'gov', title: 'Cedar policy gate', lines: ['Node.js Lambda', 'cedar-wasm'] },
 ];
 
@@ -311,7 +311,7 @@ export default function ArchitectureDiagram({ className = '' }: { className?: st
                         fontSize="12"
                         fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
                     >
-                        {'Junior approves only if risk < 15% and LTV <= 80'}
+                        {'Junior approves only if risk <= 25% and LTV <= 80'}
                     </text>
                 </g>
 

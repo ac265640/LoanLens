@@ -86,7 +86,7 @@ export default function Home() {
                     </div>
                     <h1>Every loan scored, not just 5%.</h1>
                     <p>
-                        Lenders sample about 5% of their loan tape each month, so 95% of the portfolio goes unreviewed.
+                        Manual review often covers only a sample of each month's loan tape (5% in the example below), so most of the portfolio goes unreviewed.
                         LoanLens scores all of it on AWS: five risk predictions per loan, anomaly detection, live macro
                         stress testing and a Cedar policy gate.
                     </p>
@@ -152,10 +152,10 @@ export default function Home() {
                     </p>
                     <dl className="rows">
                         <div className="row">
-                            <dt>Five calibrated risk predictions</dt>
+                            <dt>Five risk predictions</dt>
                             <dd>
                                 LightGBM models predict 3-month delinquency, 6-month delinquency, 12-month default, 12-month
-                                prepayment and next-month state transitions, calibrated with Platt scaling on held-out
+                                prepayment and next-month state transitions. The four probabilities are Platt-calibrated on held-out
                                 validation cohorts.
                             </dd>
                         </div>
@@ -163,7 +163,7 @@ export default function Home() {
                             <dt>Hybrid exception detection</dt>
                             <dd>
                                 An unsupervised Isolation Forest combined with deterministic validation rules (VR001 to VR005)
-                                flags servicing discrepancies, DTI and LTV anomalies, and possible fraud patterns.
+                                flags records that contradict themselves: out-of-order dates, paid-off loans that still carry a balance, defaults with too few days past due, missing documents on modified loans and runaway balances.
                             </dd>
                         </div>
                         <div className="row">
@@ -171,7 +171,7 @@ export default function Home() {
                             <dd>
                                 Approval permissions are written as policy, evaluated with{' '}
                                 <code>@cedar-policy/cedar-wasm</code>, across junior underwriters, senior underwriters and risk
-                                committees. A junior can approve only when risk is under 15% and LTV is 80 or less.
+                                committees. A junior can approve only when risk is 25% or less, LTV is 80 or less and the amount is $2.5M or less.
                             </dd>
                         </div>
                         <div className="row">
@@ -184,8 +184,8 @@ export default function Home() {
                         <div className="row">
                             <dt>Bedrock-grounded copilot</dt>
                             <dd>
-                                A reviewer assistant on Amazon Bedrock (Nova Lite or Claude) that answers from the scored
-                                portfolio, with TreeSHAP explanations, counterfactual what-ifs and an audit log in DynamoDB.
+                                A reviewer assistant on Amazon Bedrock (Nova Lite by default) that answers from the scored
+                                portfolio only. Every call is logged to an audit table in DynamoDB.
                             </dd>
                         </div>
                     </dl>
@@ -241,8 +241,8 @@ export default function Home() {
                                     <th>AWS Lambda</th>
                                     <td>Compute and scoring</td>
                                     <td>
-                                        Containerized arm64 Python 3.12 functions running LightGBM and Isolation Forest, plus a
-                                        Node.js function for Cedar WASM.
+                                        A containerized arm64 Python 3.12 function running LightGBM and Isolation Forest, other Python
+                                        functions for the API, and a Node.js function for Cedar WASM.
                                     </td>
                                 </tr>
                                 <tr>
@@ -261,7 +261,7 @@ export default function Home() {
                                 <tr>
                                     <th>Amazon Bedrock</th>
                                     <td>Reviewer copilot</td>
-                                    <td>Nova Lite or Claude, grounded in the scored portfolio.</td>
+                                    <td>Nova Lite by default, grounded in the scored portfolio.</td>
                                 </tr>
                                 <tr>
                                     <th>AWS Amplify Hosting</th>
