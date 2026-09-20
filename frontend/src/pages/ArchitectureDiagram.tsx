@@ -37,7 +37,7 @@ const STATIONS: Station[] = [
     // road, lane 1: ingest and score (left to right)
     { id: 's3', x: 100, y: 120, kind: 'ingest', title: 'S3', lines: ['raw/ prefix', 'triggers pipeline'], step: 1 },
     { id: 'eb', x: 290, y: 120, kind: 'ingest', title: 'EventBridge', lines: ['routes upload event'], step: 2 },
-    { id: 'sf', x: 480, y: 120, kind: 'compute', title: 'Step Functions', lines: ['orchestrates the run'], step: 3 },
+    { id: 'sf', x: 480, y: 120, kind: 'compute', title: 'Step Functions', lines: ['orchestrates the run', 'alerts via SNS'], step: 3 },
     { id: 'lam', x: 670, y: 120, kind: 'compute', title: 'Lambda ingest', lines: ['arm64 container'], step: 4 },
     { id: 'ml', x: 860, y: 120, kind: 'compute', title: 'Scoring models', lines: ['LightGBM x5, IsolationForest', 'VR001 to VR005'], step: 5 },
     // road, lane 2: serve (right to left)
@@ -46,6 +46,7 @@ const STATIONS: Station[] = [
     { id: 'ui', x: 400, y: 310, kind: 'ui', title: 'React + Vite', lines: ['Amplify Hosting'], step: 8 },
     // side lanes that feed the API
     { id: 'br', x: 470, y: 540, kind: 'ai', title: 'Bedrock', lines: ['Nova Lite', 'reviewer copilot'] },
+    { id: 'ssm', x: 250, y: 540, kind: 'data', title: 'SSM Parameter Store', lines: ['LLM key (SecureString)', 'fallback model settings'] },
     { id: 'cedar', x: 710, y: 540, kind: 'gov', title: 'Cedar policy gate', lines: ['Node.js Lambda', 'cedar-wasm'] },
 ];
 
@@ -53,8 +54,9 @@ const STATIONS: Station[] = [
 const MAIN_PATH = 'M100 120 H900 C985 120 985 310 900 310 H400';
 const MAIN_ORDER = ['s3', 'eb', 'sf', 'lam', 'ml', 'ddb', 'api', 'ui'];
 
-const BRANCHES: { from: string; d: string }[] = [
+const BRANCHES: { from: string; to?: string; d: string }[] = [
     { from: 'br', d: 'M470 540 C470 440 470 390 564 344' },
+    { from: 'ssm', to: 'br', d: 'M284 540 H436' },
     { from: 'cedar', d: 'M710 540 C710 440 710 390 616 344' },
 ];
 
@@ -67,7 +69,7 @@ const link = (a: string, b: string) => {
     (NEIGHBORS[b] ||= []).push(a);
 };
 MAIN_ORDER.forEach((id, i) => i > 0 && link(MAIN_ORDER[i - 1], id));
-BRANCHES.forEach((b) => link(b.from, 'api'));
+BRANCHES.forEach((b) => link(b.from, b.to ?? 'api'));
 
 /* Icons are drawn in a 24x24 box with a stroke, then scaled into the station disc. */
 const ICONS: Record<string, ReactNode> = {
@@ -114,6 +116,12 @@ const ICONS: Record<string, ReactNode> = {
         <>
             <path d="m10 3 1.8 5.2L17 10l-5.2 1.8L10 17l-1.8-5.2L3 10l5.2-1.8z" />
             <path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
+        </>
+    ),
+    ssm: (
+        <>
+            <circle cx="8" cy="12" r="4" />
+            <path d="M12 12h9M18 12v3M15 12v2" />
         </>
     ),
     cedar: (

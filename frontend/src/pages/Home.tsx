@@ -182,10 +182,11 @@ export default function Home() {
                             </dd>
                         </div>
                         <div className="row">
-                            <dt>Bedrock-grounded copilot</dt>
+                            <dt>Grounded reviewer copilot</dt>
                             <dd>
-                                A reviewer assistant on Amazon Bedrock (Nova Lite by default) that answers from the scored
-                                portfolio only. Every call is logged to an audit table in DynamoDB.
+                                A reviewer assistant that answers from the scored portfolio only, using Amazon Bedrock when the
+                                account has access and an OpenAI-compatible model otherwise. Every call is logged to an audit
+                                table in DynamoDB.
                             </dd>
                         </div>
                     </dl>
@@ -235,7 +236,15 @@ export default function Home() {
                                 <tr>
                                     <th>AWS Step Functions</th>
                                     <td>Orchestration</td>
-                                    <td>Runs and monitors the asynchronous scoring workflow.</td>
+                                    <td>
+                                        Runs the scoring workflow, retries transient failures, and publishes an alert when a run
+                                        finds high-risk loans or data exceptions.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Amazon SNS</th>
+                                    <td>Alerts</td>
+                                    <td>Step Functions publishes to a topic; subscribe an email address to be told when a tape needs attention.</td>
                                 </tr>
                                 <tr>
                                     <th>AWS Lambda</th>
@@ -260,8 +269,17 @@ export default function Home() {
                                 </tr>
                                 <tr>
                                     <th>Amazon Bedrock</th>
-                                    <td>Reviewer copilot</td>
-                                    <td>Nova Lite by default, grounded in the scored portfolio.</td>
+                                    <td>Reviewer copilot, first choice</td>
+                                    <td>
+                                        Nova Lite, grounded in the scored portfolio. If the account has no Bedrock access the copilot
+                                        falls back to an OpenAI-compatible model, then to a deterministic template. The UI always
+                                        shows which one answered.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>AWS Systems Manager Parameter Store</th>
+                                    <td>Secrets and settings</td>
+                                    <td>Holds the fallback model's endpoint and API key (SecureString), so no key lives in code or the repo.</td>
                                 </tr>
                                 <tr>
                                     <th>AWS Amplify Hosting</th>
