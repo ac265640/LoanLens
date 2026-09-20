@@ -13,12 +13,12 @@ built for the WeMakeDevs × AWS "First Commit" hackathon (Bharat Builds Tour).
 
 ## Live demo
 
-- **Dashboard:** https://main.d3uibhd8oe3ebl.amplifyapp.com
+- **App:** https://main.d3uibhd8oe3ebl.amplifyapp.com (landing page; the dashboard is at `/dashboard`)
 - **API:** `https://kwazm9gei8.execute-api.us-east-1.amazonaws.com/prod` (try `GET /loans`)
 
 To see it work end to end:
 
-1. Open the dashboard, then drop `data/sample/demo_loan_tape.csv` on the upload area. That
+1. Open `/dashboard`, then drop `data/sample/demo_loan_tape.csv` on the upload area. That
    uploads to S3, EventBridge starts a Step Functions run, and a container Lambda scores
    every loan into DynamoDB. The table refreshes when the run completes.
 2. Open the **High Risk** tab and click a loan. In the *Cedar Policy Compliance Gate*, run
