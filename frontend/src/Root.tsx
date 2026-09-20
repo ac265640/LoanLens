@@ -75,7 +75,7 @@ export default function Root() {
                                 Home
                             </NavLink>
                             <NavLink to="/dashboard" className={({ isActive }) => `ll-nav-link ${isActive ? 'active' : ''}`}>
-                                Dashboard
+                                Live Platform
                             </NavLink>
                         </nav>
 
