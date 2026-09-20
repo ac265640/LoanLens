@@ -76,6 +76,9 @@ def handler(event, context):
 
     grid_data = _load_grid()
     result = _bilinear_interpolate(grid_data, rate_bps, unemp_pct)
+    # The unstressed point, so a caller can say how far a scenario moved from today.
+    baseline = _bilinear_interpolate(grid_data, 0, 0)
+    result["baseline"] = {k: baseline[k] for k in NUMERIC_FIELDS}
     result["portfolio_total_exposure_usd"] = grid_data["portfolio_total_exposure_usd"]
     result["loan_count"] = grid_data["loan_count"]
     result["assumptions"] = grid_data["assumptions"]
