@@ -9,7 +9,6 @@ and prepayment risk, flags records that contradict themselves, stress-tests the 
 policy-as-code. It runs entirely on serverless AWS and was built for the WeMakeDevs x AWS *First Commit* hackathon.
 
 - **Live app:** https://main.d3uibhd8oe3ebl.amplifyapp.com (landing page; the dashboard is at `/dashboard`)
-- **API:** `https://kwazm9gei8.execute-api.us-east-1.amazonaws.com/prod` (try `GET /loans`; see [docs/api.md](docs/api.md))
 - **Demo video:** https://youtu.be/FdAweAtTIJ8
 - **Blog:** [Scoring Every Loan, Not a Sample: A Serverless Loan Risk Platform on AWS](https://builder.aws.com/content/3JawUHc9oA7BX5qNSjXqyWVEe2B/scoring-every-loan-not-a-sample-a-serverless-loan-risk-platform-on-aws) (AWS Builder Center)
 
