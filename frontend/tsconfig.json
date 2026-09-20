@@ -5,6 +5,7 @@
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
     "jsx": "react-jsx",
+    "allowJs": true,
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
 
