@@ -5,6 +5,7 @@ import PortfolioTable from "./components/PortfolioTable";
 import LoanDrawer from "./components/LoanDrawer";
 import ShockwavePanel from "./components/ShockwavePanel";
 import CopilotChat from "./components/CopilotChat";
+import CoverageCard from "./components/CoverageCard";
 
 export default function App() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -86,6 +87,8 @@ export default function App() {
               accent="var(--emerald)"
             />
           </div>
+
+          <CoverageCard summary={summary} />
 
           <CopilotChat />
         </div>

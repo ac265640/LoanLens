@@ -41,6 +41,7 @@ export interface PortfolioSummary {
   total_loans: number;
   high_risk_count: number;
   exception_count: number;
+  attention_count: number;
   total_exposure_usd: number;
 }
 
@@ -87,6 +88,7 @@ export interface StressResult {
   var99_usd: number;
   portfolio_total_exposure_usd: number;
   loan_count: number;
+  baseline?: Partial<StressResult>;
 }
 
 export function queryStress(rate_shock_bps: number, unemployment_delta_pct: number) {
@@ -121,6 +123,7 @@ export function cedarAuthorize(userId: string, role: string, action: string, loa
 export interface CopilotResult {
   mode: string;
   model_name: string;
+  provider?: string;
   fallback?: boolean;
   fallback_reason?: string | null;
   output: string;
@@ -131,9 +134,16 @@ export function copilotMemo(loan_id: string) {
   return request<CopilotResult>("/copilot", { method: "POST", body: JSON.stringify({ mode: "memo", loan_id }) });
 }
 
-export function copilotAsk(question: string, filters: Record<string, unknown> = {}) {
+export function copilotAsk(question: string) {
   return request<CopilotResult>("/copilot", {
     method: "POST",
-    body: JSON.stringify({ mode: "portfolio_qa", question, filters }),
+    body: JSON.stringify({ mode: "portfolio_qa", question }),
+  });
+}
+
+export function copilotExplainStress(scenario: StressResult) {
+  return request<CopilotResult>("/copilot", {
+    method: "POST",
+    body: JSON.stringify({ mode: "stress_explain", scenario_result: scenario }),
   });
 }

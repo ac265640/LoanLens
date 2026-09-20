@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { queryStress, type StressResult } from "../api";
+import { copilotExplainStress, queryStress, type StressResult } from "../api";
 
 function useDebouncedEffect(fn: () => void, deps: unknown[], delay: number) {
   useEffect(() => {
@@ -16,9 +16,12 @@ export default function ShockwavePanel() {
   const [result, setResult] = useState<StressResult | null>(null);
   const [history, setHistory] = useState<{ label: string; el: number }[]>([]);
   const [loading, setLoading] = useState(false);
+  const [explanation, setExplanation] = useState<{ text: string; note: string; fallback: boolean } | null>(null);
+  const [explaining, setExplaining] = useState(false);
 
   const fetchStress = useCallback(async (r: number, u: number) => {
     setLoading(true);
+    setExplanation(null); // an explanation of the previous scenario is stale once the sliders move
     try {
       const res = await queryStress(r, u);
       setResult(res);
@@ -29,6 +32,23 @@ export default function ShockwavePanel() {
       setLoading(false);
     }
   }, []);
+
+  async function explainScenario() {
+    if (!result) return;
+    setExplaining(true);
+    try {
+      const r = await copilotExplainStress(result);
+      setExplanation({
+        text: r.output,
+        fallback: !!r.fallback,
+        note: r.fallback ? "Template answer — no language model could be reached" : `Answered by ${r.model_name}`,
+      });
+    } catch (e) {
+      setExplanation({ text: e instanceof Error ? e.message : "Could not explain this scenario.", note: "Error", fallback: true });
+    } finally {
+      setExplaining(false);
+    }
+  }
 
   useDebouncedEffect(() => {
     fetchStress(rate, unemp);
@@ -69,6 +89,25 @@ export default function ShockwavePanel() {
         <StatTile label="Expected Loss" value={result ? `$${(result.expected_loss_usd / 1e6).toFixed(2)}M` : "—"} accent="var(--amber)" />
         <StatTile label="Capital (CAR) Impact" value={result ? `${result.car_impact_pct.toFixed(1)}%` : "—"} />
         <StatTile label="VaR 99%" value={result ? `$${(result.var99_usd / 1e6).toFixed(2)}M` : "—"} accent="var(--crimson)" />
+      </div>
+
+      <div className="mb-3">
+        <button
+          onClick={explainScenario}
+          disabled={!result || explaining}
+          className="rounded-lg px-3 py-1.5 text-xs font-medium disabled:opacity-50"
+          style={{ background: "var(--accent)", color: "#0a0d14" }}
+        >
+          {explaining ? "Explaining…" : "Explain this scenario"}
+        </button>
+        {explanation && (
+          <div className="mt-2 whitespace-pre-wrap rounded-lg p-3 text-xs leading-relaxed" style={{ background: "var(--bg-panel-2)", color: "var(--text)" }}>
+            <p className="mb-1 text-[10px] uppercase tracking-wide" style={{ color: explanation.fallback ? "var(--amber)" : "var(--text-dim)" }}>
+              {explanation.note}
+            </p>
+            {explanation.text}
+          </div>
+        )}
       </div>
 
       <div className="h-40">

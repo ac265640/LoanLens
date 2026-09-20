@@ -110,7 +110,7 @@ export default function CopilotChat() {
           className="rounded-full border px-2 py-0.5 text-[10.5px]"
           style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}
         >
-          Grounded in Bedrock
+          Grounded in your portfolio
         </span>
       </div>
 
