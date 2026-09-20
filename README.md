@@ -66,7 +66,8 @@ model to explain them. It tries **Amazon Bedrock** first, then any **OpenAI-comp
 SSM Parameter Store, then a **deterministic template** built from the same facts. The response always states which one answered
 and why the others did not, so a template answer is never presented as model output.
 
-Bedrock access depends on your AWS account passing Bedrock's account verification. To use a free model instead:
+The live deployment answers with `openai/gpt-oss-120b` on Groq's free tier, because our new AWS account was still in
+Bedrock's account verification; Bedrock takes over automatically once access is granted. To configure a model yourself:
 
 ```bash
 scripts/configure_llm.sh groq      # or gemini | openai | custom
@@ -164,7 +165,7 @@ default by 1.46 points. Methods, caveats and the full tables are in [docs/ml-pip
 ## Team
 
 - **Amit Chauhan** ([@ac265640](https://github.com/ac265640)): ML pipeline, AWS architecture and backend, deployment
-- **Abhishek Singh**: frontend design and implementation (landing page, architecture page, theming, copilot interface)
+- **Abhishek Singh**: frontend design and implementation (landing page and animations, architecture page, theming, the Live Platform dashboard, loan table, coverage card and copilot interface)
 
 ## AI tools
 
