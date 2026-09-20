@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import App from './App'; // your existing dashboard, untouched
 import './pages/Home.css';
@@ -95,6 +95,7 @@ export default function Root() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/dashboard" element={<App />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </div>
         </BrowserRouter>
