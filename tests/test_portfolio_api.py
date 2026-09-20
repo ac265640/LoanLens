@@ -73,6 +73,7 @@ def test_summary_ignores_the_filter(monkeypatch):
     assert filtered["summary"] == unfiltered  # ...KPIs are not
     assert unfiltered["high_risk_count"] == 2
     assert unfiltered["exception_count"] == 1
+    assert unfiltered["attention_count"] == 3  # A and C are high risk, B is an exception
 
 
 def test_exceptions_filter_and_ordering(monkeypatch):

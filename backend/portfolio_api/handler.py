@@ -56,6 +56,9 @@ def _summarize(items: list) -> dict:
         "total_loans": len(items),
         "high_risk_count": sum(1 for i in items if i.get("prob_next_12m_default", 0) >= 0.20),
         "exception_count": sum(1 for i in items if i.get("exception_required") == 1),
+        "attention_count": sum(
+            1 for i in items if i.get("prob_next_12m_default", 0) >= 0.20 or i.get("exception_required") == 1
+        ),
         "total_exposure_usd": round(sum(i.get("current_balance", 0) for i in items), 2),
     }
 
