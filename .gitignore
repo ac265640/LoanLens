@@ -1,34 +1,40 @@
+# Dependencies and build output
 node_modules/
-__pycache__/
-*.pyc
+frontend/node_modules/
 .venv/
 venv/
-.env
+__pycache__/
+*.pyc
 .aws-sam/
-.DS_Store
 dist/
 build/
-frontend/node_modules/
-frontend/.env
-*.log
-
-# Regenerable via training/generate_data.py + training/train_*.py —
-# not committed to keep the repo lean; data/sample/ holds the small
-# curated demo tape used by the ingestion demo, which IS committed.
-data/raw/
-
-# Local tooling config, not part of the project itself
-.claude/
+*.tsbuildinfo
 
 # Secrets and local environment. Never commit these. AWS credentials live in
 # ~/.aws/credentials (`aws configure`) or AWS_* environment variables, not here.
 .env
 .env.*
 !.env.example
+frontend/.env
 *.pem
 *.key
 credentials.csv
 *_accessKeys.csv
 rootkey.csv
 .aws/
-*.tsbuildinfo
+
+# Logs, caches, editor and OS files
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+.DS_Store
+
+# Regenerable via training/generate_data.py + training/train_*.py, so not
+# committed. data/sample/ holds the small demo tape, which IS committed.
+data/raw/
+
+# Local tooling config, not part of the project
+.claude/

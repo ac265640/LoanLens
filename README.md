@@ -76,6 +76,10 @@ scripts/configure_llm.sh groq      # or gemini | openai | custom
 The key is read with a hidden prompt, validated with real requests, stored as an SSM SecureString, and never appears on a
 command line. No redeploy is needed. Details in [docs/deployment.md](docs/deployment.md).
 
+## Documentation
+
+[Architecture](docs/architecture.md) | [API reference](docs/api.md) | [ML pipeline](docs/ml-pipeline.md) | [Deployment](docs/deployment.md) | [Contributing](CONTRIBUTING.md)
+
 ## Repository structure
 
 ```
@@ -169,7 +173,10 @@ default by 1.46 points. Methods, caveats and the full tables are in [docs/ml-pip
 
 ## AI tools
 
-Claude Code (Anthropic) was used for architecture, the AWS integration, the analysis scripts, tests and debugging.
+We built LoanLens with an AI coding assistant (Claude Code, by Anthropic) working alongside the team. It helped write and
+debug code, tests, deployment scripts and documentation. The team set the direction: the problem, the architecture and AWS
+services, the scope, and the trade-offs, and we ran, tested and reviewed what was committed. The reviewer copilot inside the
+product is a separate feature: it uses Amazon Bedrock when available, or a configurable OpenAI-compatible model.
 
 ## Credits and licence
 
