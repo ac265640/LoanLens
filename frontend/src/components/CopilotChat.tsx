@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { copilotAsk } from "../api";
+import RichText from "./RichText";
 
 interface Message {
   role: "user" | "assistant";
@@ -173,7 +174,7 @@ export default function CopilotChat() {
                     className="max-w-[88%] rounded-2xl rounded-tl-md border px-3.5 py-2.5 text-[13px] leading-relaxed"
                     style={{ background: "var(--bg-panel-2)", borderColor: "var(--border)", color: "var(--text)" }}
                   >
-                    <div className="whitespace-pre-wrap">{m.text}</div>
+                    <RichText text={m.text} />
                     {m.model && (
                       <div
                         className="mt-2.5 flex items-center gap-1.5 border-t pt-2 text-[10.5px]"
@@ -183,7 +184,7 @@ export default function CopilotChat() {
                         }}
                       >
                         <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "currentColor" }} />
-                        {m.fallback ? "Template answer — the Bedrock model could not be reached" : `Answered by ${m.model}`}
+                        {m.fallback ? "Template answer — no language model could be reached" : `Answered by ${m.model}`}
                       </div>
                     )}
                   </div>
@@ -202,7 +203,7 @@ export default function CopilotChat() {
                     />
                   ))}
                 </span>
-                Retrieving grounded facts, then asking Bedrock…
+                Retrieving grounded facts, then asking the model…
               </div>
             )}
           </div>

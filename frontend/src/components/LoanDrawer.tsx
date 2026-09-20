@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Loan, CedarResult } from "../api";
 import { cedarAuthorize, copilotMemo, ltvPct } from "../api";
 import RiskBadge from "./RiskBadge";
+import RichText from "./RichText";
 
 const ROLES = ["JuniorUnderwriter", "SeniorUnderwriter", "RiskCommittee"];
 const ACTIONS = ["ApproveLoan", "OverrideAnomaly"];
@@ -43,7 +44,7 @@ export default function LoanDrawer({ loan, onClose }: { loan: Loan; onClose: () 
     try {
       const r = await copilotMemo(loan.loan_id);
       setMemo(r.output);
-      setMemoModel(r.fallback ? "Template answer — the Bedrock model could not be reached" : `Answered by ${r.model_name}`);
+      setMemoModel(r.fallback ? "Template answer — no language model could be reached" : `Answered by ${r.model_name}`);
     } catch (e) {
       setMemo(e instanceof Error ? e.message : "Memo generation failed.");
     } finally {
@@ -161,7 +162,7 @@ export default function LoanDrawer({ loan, onClose }: { loan: Loan; onClose: () 
           )}
         </Section>
 
-        <Section title="Bedrock Reviewer Memo">
+        <Section title="Reviewer Memo">
           <button
             onClick={generateMemo}
             disabled={memoLoading}
@@ -171,11 +172,11 @@ export default function LoanDrawer({ loan, onClose }: { loan: Loan; onClose: () 
             {memoLoading ? "Generating…" : "Generate Credit Committee Memo"}
           </button>
           {memo && (
-            <div className="mt-2 whitespace-pre-wrap rounded-lg p-3 text-xs leading-relaxed" style={{ background: "var(--bg-panel-2)", color: "var(--text)" }}>
+            <div className="mt-2 rounded-lg p-3 text-xs leading-relaxed" style={{ background: "var(--bg-panel-2)", color: "var(--text)" }}>
               <p className="mb-1 text-[10px] uppercase tracking-wide" style={{ color: "var(--text-dim)" }}>
                 {memoModel}
               </p>
-              {memo}
+              <RichText text={memo} />
             </div>
           )}
         </Section>
