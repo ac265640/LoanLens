@@ -21,6 +21,18 @@ Parameters:
     Default: amazon.nova-lite-v1:0
     Description: Bedrock model id used by the reviewer copilot (Amazon Nova Lite by default — cheap and fast; swap for an Anthropic model id once access is approved).
 
+  DashboardUrl:
+    Type: String
+    Default: https://main.d3uibhd8oe3ebl.amplifyapp.com/dashboard
+    Description: Link included in the alert email.
+  AlertEmail:
+    Type: String
+    Default: ""
+    Description: Optional. If set, this address is subscribed to the alert topic (it must confirm the subscription email). Leave empty and subscribe with `aws sns subscribe` instead.
+
+Conditions:
+  HasAlertEmail: !Not [!Equals [!Ref AlertEmail, ""]]
+
 Resources:
   # ---------- Storage ----------
   LoanTapesBucket:
@@ -30,6 +42,12 @@ Resources:
       NotificationConfiguration:
         EventBridgeConfiguration:
           EventBridgeEnabled: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-uploaded-tapes
+            Status: Enabled
+            Prefix: raw/
+            ExpirationInDays: 7
       CorsConfiguration:
         CorsRules:
           - AllowedMethods: [GET, PUT, POST]
@@ -163,12 +181,21 @@ Resources:
             TableName: !Ref LoansTable
         - DynamoDBCrudPolicy:
             TableName: !Ref CopilotAuditTable
+        # LLM endpoint settings; the API key is a SecureString under /loanlens/llm/
+        - SSMParameterReadPolicy:
+            ParameterName: loanlens/llm/*
         - Statement:
             - Effect: Allow
               Action:
                 - bedrock:InvokeModel
                 - bedrock:Converse
               Resource: "*"
+            - Effect: Allow
+              Action: kms:Decrypt
+              Resource: "*"
+              Condition:
+                StringEquals:
+                  kms:ViaService: !Sub "ssm.${AWS::Region}.amazonaws.com"
       Events:
         Api:
           Type: Api
@@ -245,10 +272,30 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          ThrottlingRateLimit: 20
+          ThrottlingBurstLimit: 40
       Cors:
         AllowMethods: "'GET,POST,OPTIONS'"
         AllowHeaders: "'Content-Type'"
         AllowOrigin: "'*'"
+
+  # ---------- Alerts: published by Step Functions when a run finds loans that need attention ----------
+  AlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: loanlens-alerts
+      DisplayName: LoanLens alerts
+
+  AlertEmailSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: HasAlertEmail
+    Properties:
+      TopicArn: !Ref AlertTopic
+      Protocol: email
+      Endpoint: !Ref AlertEmail
 
   # ---------- Step Functions: orchestrates ingest on new tape upload ----------
   IngestStateMachine:
@@ -258,9 +305,13 @@ Resources:
       DefinitionUri: statemachine/ingest.asl.json
       DefinitionSubstitutions:
         IngestPipelineFunctionArn: !GetAtt IngestPipelineFunction.Arn
+        AlertTopicArn: !Ref AlertTopic
+        DashboardUrl: !Ref DashboardUrl
       Policies:
         - LambdaInvokePolicy:
             FunctionName: !Ref IngestPipelineFunction
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt AlertTopic.TopicName
       Events:
         NewTapeUploaded:
           Type: EventBridgeRule
@@ -283,3 +334,6 @@ Outputs:
     Value: !Ref LoanTapesBucket
   StateMachineArn:
     Value: !Ref IngestStateMachine
+  AlertTopicArn:
+    Description: Subscribe with `aws sns subscribe --protocol email --notification-endpoint <address> --topic-arn <this>`
+    Value: !Ref AlertTopic

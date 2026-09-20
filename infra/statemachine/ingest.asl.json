@@ -1,5 +1,5 @@
 {
-  "Comment": "LoanLens ingest pipeline: triggered by a new loan tape landing in s3://loanlens-tapes/raw/, scores 100% of the portfolio via the ingest_pipeline Lambda and writes results to DynamoDB.",
+  "Comment": "LoanLens ingest: a loan tape lands in s3://<bucket>/raw/, the ingest Lambda scores 100% of the portfolio into DynamoDB, and if the run found high-risk loans or data exceptions an alert is published to SNS.",
   "StartAt": "PrepareRun",
   "States": {
     "PrepareRun": {
@@ -13,15 +13,53 @@
     "ScoreLoanTape": {
       "Type": "Task",
       "Resource": "${IngestPipelineFunctionArn}",
+      "ResultPath": "$.result",
       "Retry": [
         {
-          "ErrorEquals": ["States.TaskFailed"],
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
           "IntervalSeconds": 5,
           "MaxAttempts": 2,
           "BackoffRate": 2.0
         }
       ],
+      "Next": "NeedsAttention"
+    },
+    "NeedsAttention": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Or": [
+            {
+              "Variable": "$.result.high_risk",
+              "NumericGreaterThan": 0
+            },
+            {
+              "Variable": "$.result.exceptions",
+              "NumericGreaterThan": 0
+            }
+          ],
+          "Next": "SendAlert"
+        }
+      ],
+      "Default": "Done"
+    },
+    "SendAlert": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "${AlertTopicArn}",
+        "Subject": "LoanLens: loans need attention",
+        "Message.$": "States.Format('Tape {} scored: {} loans, {} high-risk (20% or more default probability), {} with data exceptions. Review them at ${DashboardUrl}', $.result.run_id, $.result.total, $.result.high_risk, $.result.exceptions)"
+      },
       "End": true
+    },
+    "Done": {
+      "Type": "Succeed"
     }
   }
 }
