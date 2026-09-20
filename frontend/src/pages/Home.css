@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap');
 
 /* Everything is scoped to .ll-shell / .home so it cannot leak into the dashboard. */
 .ll-shell {
@@ -299,15 +299,19 @@
     margin-bottom: 16px;
 }
 
-.hero-brand span {
-    color: var(--scored);
-}
+/* NOTE: the old `.hero-brand span { color: var(--scored) }` rule is removed.
+   It matched FoldText's internal spans. Colour now comes from the color prop. */
 
 .hero h1 {
     font-size: clamp(1.8rem, 3.8vw, 2.8rem);
     line-height: 1.08;
     margin-bottom: 24px;
     max-width: 18ch;
+}
+
+/* FoldText root must be block so the words wrap inside the h1's max-width */
+.hero h1 .fold-text {
+    display: block;
 }
 
 .hero-copy p {
@@ -575,7 +579,7 @@
     margin-bottom: 12px;
 }
 
-/* ---------------- reveal on scroll (hero + diagram only) ---------------- */
+/* ---------------- reveal on scroll (hero viz + diagram only) ---------------- */
 .home .reveal-on-scroll {
     opacity: 0;
     transform: translateY(24px);
