@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { copilotExplainStress, queryStress, type StressResult } from "../api";
+import RichText from "./RichText";
 
 function useDebouncedEffect(fn: () => void, deps: unknown[], delay: number) {
   useEffect(() => {
@@ -18,6 +19,7 @@ export default function ShockwavePanel() {
   const [loading, setLoading] = useState(false);
   const [explanation, setExplanation] = useState<{ text: string; note: string; fallback: boolean } | null>(null);
   const [explaining, setExplaining] = useState(false);
+  const [stressError, setStressError] = useState(false);
 
   const fetchStress = useCallback(async (r: number, u: number) => {
     setLoading(true);
@@ -25,9 +27,10 @@ export default function ShockwavePanel() {
     try {
       const res = await queryStress(r, u);
       setResult(res);
+      setStressError(false);
       setHistory((h) => [...h.slice(-19), { label: `${r >= 0 ? "+" : ""}${r}bps / ${u >= 0 ? "+" : ""}${u}%`, el: res.expected_loss_usd }]);
     } catch {
-      // stress endpoint unavailable — leave last known result showing
+      setStressError(true); // keep the last result on screen, but say it is stale
     } finally {
       setLoading(false);
     }
@@ -61,6 +64,11 @@ export default function ShockwavePanel() {
           Shockwave — Live Macro Stress Simulator
         </h3>
         {loading && <span className="text-xs animate-pulse-soft" style={{ color: "var(--accent)" }}>recomputing…</span>}
+        {!loading && stressError && (
+          <span className="text-xs" role="alert" style={{ color: "var(--amber)" }}>
+            Stress service unreachable. Move a slider to retry.
+          </span>
+        )}
       </div>
 
       <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -101,11 +109,11 @@ export default function ShockwavePanel() {
           {explaining ? "Explaining…" : "Explain this scenario"}
         </button>
         {explanation && (
-          <div className="mt-2 whitespace-pre-wrap rounded-lg p-3 text-xs leading-relaxed" style={{ background: "var(--bg-panel-2)", color: "var(--text)" }}>
+          <div className="mt-2 rounded-lg p-3 text-xs leading-relaxed" style={{ background: "var(--bg-panel-2)", color: "var(--text)" }}>
             <p className="mb-1 text-[10px] uppercase tracking-wide" style={{ color: explanation.fallback ? "var(--amber)" : "var(--text-dim)" }}>
               {explanation.note}
             </p>
-            {explanation.text}
+            <RichText text={explanation.text} />
           </div>
         )}
       </div>

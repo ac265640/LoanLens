@@ -1,15 +1,44 @@
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`${res.status} ${res.statusText}: ${text}`);
+class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
   }
-  return res.json();
+}
+
+// Transient failures are retried; a definite answer (any other 4xx/5xx) is not.
+const RETRYABLE_STATUS = new Set([429, 502, 503, 504]);
+const RETRY_DELAYS_MS = [600, 1500];
+const ATTEMPT_TIMEOUT_MS = 28_000; // API Gateway cuts a request off at 29s
+
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  let lastError: unknown = new Error("Network error");
+
+  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
+    if (attempt > 0) await new Promise((r) => setTimeout(r, RETRY_DELAYS_MS[attempt - 1]));
+    const last = attempt === RETRY_DELAYS_MS.length;
+
+    try {
+      const res = await fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
+      });
+      if (res.ok) return res.json();
+
+      const text = await res.text().catch(() => "");
+      const err = new ApiError(res.status, `${res.status} ${res.statusText}: ${text}`);
+      if (!RETRYABLE_STATUS.has(res.status) || last) throw err;
+      lastError = err;
+    } catch (e) {
+      if (e instanceof ApiError) throw e; // an HTTP answer we should not retry
+      lastError = e; // connection reset, DNS, timeout: worth another attempt
+      if (last) break;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("Network error");
 }
 
 export interface Loan {

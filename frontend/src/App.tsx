@@ -11,6 +11,7 @@ export default function App() {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [summary, setSummary] = useState<PortfolioSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [selected, setSelected] = useState<Loan | null>(null);
   const [filter, setFilter] = useState<"all" | "high_risk" | "exceptions">("all");
 
@@ -23,9 +24,9 @@ export default function App() {
       const r = await listLoans(params);
       setLoans(r.loans);
       setSummary(r.summary);
+      setLoadFailed(false);
     } catch {
-      // API not deployed yet, or empty portfolio — table shows empty state
-      setLoans([]);
+      setLoadFailed(true);
     } finally {
       setLoading(false);
     }
@@ -70,6 +71,23 @@ export default function App() {
               ))}
             </div>
           </div>
+
+          {loadFailed && (
+            <div
+              className="glass flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm"
+              role="alert"
+              style={{ color: "var(--amber)" }}
+            >
+              <span>Could not reach the LoanLens API. Your connection may be unstable.</span>
+              <button
+                onClick={refresh}
+                className="rounded-lg px-3 py-1.5 text-xs font-medium"
+                style={{ background: "var(--accent)", color: "#0a0d14" }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
 
           <PortfolioTable loans={loans} loading={loading} onSelect={setSelected} />
           <ShockwavePanel />
