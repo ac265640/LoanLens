@@ -33,6 +33,15 @@ if [ -z "$APP_ID" ] || [ "$APP_ID" = "None" ]; then
   aws amplify create-branch --app-id "$APP_ID" --branch-name "$BRANCH" --region "$REGION" >/dev/null
 fi
 
+# The dashboard uses client-side routing (BrowserRouter: / and /dashboard).
+# Without a rewrite, opening or refreshing a deep link 404s because only
+# index.html exists on the CDN. Serve index.html (200) for any extensionless path.
+RULES="$(mktemp)"
+cat > "$RULES" <<'JSON'
+[{"source":"</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json|webp)$)([^.]+$)/>","target":"/index.html","status":"200"}]
+JSON
+aws amplify update-app --app-id "$APP_ID" --custom-rules "file://$RULES" --region "$REGION" >/dev/null
+
 ZIP="$(mktemp -d)/dist.zip"
 (cd "$ROOT/frontend/dist" && zip -qr "$ZIP" .)
 
