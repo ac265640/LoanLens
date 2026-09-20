@@ -351,40 +351,6 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* ---------------- limitations ---------------- */}
-            <section className="block">
-                <div className="narrow">
-                    <h2>What it does not do</h2>
-                    <ul className="limits">
-                        <li>
-                            <strong>It runs on synthetic data.</strong> The portfolio is generated, with monthly panel
-                            history, so no real borrower data is involved. It also means model metrics show how the pipeline
-                            behaves, not how it would perform on a real lender's book.
-                        </li>
-                        <li>
-                            <strong>Scores are estimates, not credit decisions.</strong> A human reviewer stays in the loop,
-                            and the Cedar gate limits who can approve what.
-                        </li>
-                        <li>
-                            <strong>Risk capital is illustrative.</strong> Expected loss uses a fixed 35% Loss Given Default,
-                            and capital impact and VaR use parameterized z-score approximations.
-                        </li>
-                        <li>
-                            <strong>The copilot can still be wrong.</strong> It only sees the scored portfolio, but it is a
-                            language model. Check its answers against the table before acting on them.
-                        </li>
-                        <li>
-                            <strong>Cedar works in whole numbers.</strong> Default probabilities are scaled by 100 and LTV
-                            thresholds are applied as conservative upper bounds.
-                        </li>
-                        <li>
-                            <strong>Cold starts.</strong> Scale-to-zero means the first request after a quiet period waits for
-                            a Lambda cold start.
-                        </li>
-                    </ul>
-                </div>
-            </section>
-
             {/* ---------------- closing ---------------- */}
             <section className="closing">
                 <h2>Try it on a loan tape</h2>

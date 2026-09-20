@@ -552,24 +552,6 @@
     font-size: 0.9rem;
 }
 
-/* ---------------- limitations ---------------- */
-.limits {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.limits li {
-    padding: 4px 0 4px 18px;
-    margin-bottom: 14px;
-    border-left: 3px solid var(--amber);
-    color: var(--muted);
-}
-
-.limits li strong {
-    color: var(--ink);
-}
-
 /* ---------------- closing ---------------- */
 .closing {
     padding-top: 96px;
