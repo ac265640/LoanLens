@@ -26,7 +26,7 @@ UA="loanlens-configure/1.0"  # some providers sit behind a WAF that rejects the 
 die() { echo "error: $*" >&2; exit 1; }
 
 case "$PROVIDER" in
-  groq)   BASE="https://api.groq.com/openai/v1";                       PREFER="llama-3.3-70b-versatile llama-3.1-70b-versatile llama-3.1-8b-instant" ;;
+  groq)   BASE="https://api.groq.com/openai/v1";                       PREFER="openai/gpt-oss-120b openai/gpt-oss-20b llama-3.3-70b-versatile qwen/qwen3.8-27b" ;;
   gemini) BASE="https://generativelanguage.googleapis.com/v1beta/openai"; PREFER="gemini-2.5-flash gemini-2.0-flash gemini-1.5-flash" ;;
   openai) BASE="https://api.openai.com/v1";                            PREFER="gpt-4o-mini gpt-4.1-mini gpt-4o" ;;
   custom) BASE="${LLM_BASE_URL:-}"; [ -n "$BASE" ] || die "custom needs LLM_BASE_URL, e.g. https://api.example.com/v1"
@@ -63,7 +63,7 @@ echo "Using model: $MODEL"
 
 echo "Sending a test request ..."
 REPLY="$(curl -sS --fail --max-time 45 -A "$UA" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
-  -d "{\"model\":\"$MODEL\",\"messages\":[{\"role\":\"user\",\"content\":\"Reply with the single word: OK\"}],\"max_tokens\":8}" \
+  -d "{\"model\":\"$MODEL\",\"messages\":[{\"role\":\"user\",\"content\":\"Reply with the single word: OK\"}],\"max_tokens\":200}" \
   "$BASE/chat/completions")" || die "the test request failed; the key or model was not accepted"
 echo "$REPLY" | python3 -c 'import json,sys; print("Model replied:", json.load(sys.stdin)["choices"][0]["message"]["content"].strip()[:40])'
 

@@ -383,7 +383,7 @@ def _invoke_openai_compat(prompt: str):
         "model": cfg["model"],
         "messages": [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
         "temperature": 0.2,
-        "max_tokens": 700,
+        "max_tokens": 1500,
     }).encode()
     req = urllib.request.Request(
         cfg["base_url"].rstrip("/") + "/chat/completions",
