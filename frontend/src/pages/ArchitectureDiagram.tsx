@@ -45,7 +45,7 @@ const STATIONS: Station[] = [
     { id: 'api', x: 590, y: 310, kind: 'api', title: 'API Gateway', lines: ['REST'], step: 7 },
     { id: 'ui', x: 400, y: 310, kind: 'ui', title: 'React + Vite', lines: ['Amplify Hosting'], step: 8 },
     // side lanes that feed the API
-    { id: 'br', x: 470, y: 540, kind: 'ai', title: 'Bedrock', lines: ['Nova Lite', 'reviewer copilot'] },
+    { id: 'br', x: 470, y: 540, kind: 'ai', title: 'Reviewer copilot', lines: ['Bedrock first, then', 'a fallback model'] },
     { id: 'ssm', x: 250, y: 540, kind: 'data', title: 'SSM Parameter Store', lines: ['LLM key (SecureString)', 'fallback model settings'] },
     { id: 'cedar', x: 710, y: 540, kind: 'gov', title: 'Cedar policy gate', lines: ['Node.js Lambda', 'cedar-wasm'] },
 ];

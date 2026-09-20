@@ -20,7 +20,7 @@ npm run build            # tsc type-check + production build; run before pushing
 | `src/pages/` | `Home` (landing), `ArchitectureDiagram`, `HexBackground` |
 | `src/App.tsx` | The dashboard itself (route `/dashboard`) |
 | `src/api.ts` | Typed API client, response types, the LTV-band to integer helper the Cedar gate needs |
-| `src/components/` | `PortfolioTable`, `LoanDrawer`, `ShockwavePanel`, `CopilotChat`, `UploadDropzone`, `RiskBadge` |
+| `src/components/` | `PortfolioTable`, `LoanDrawer`, `ShockwavePanel`, `CopilotChat`, `CoverageCard`, `UploadDropzone`, `RiskBadge`, `RichText` (safe renderer for the copilot's markdown) |
 | `src/index.css` | Design tokens for both themes (CSS variables under `[data-theme]`) and shared surface styles |
 
 To see loans in the dashboard, drop `data/sample/demo_loan_tape.csv` on the upload area.
