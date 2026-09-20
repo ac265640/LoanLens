@@ -130,3 +130,26 @@ def test_delete_stale_removes_nothing_when_all_current():
     table = _FakeTable([[{"loan_id": "A", "run_id": "new"}]])
     assert handler._delete_stale_loans(table, "new") == 0
     assert table.deleted == []
+
+
+# ---------------------------------------------------------------- tape validation
+
+
+def test_validate_tape_accepts_the_demo_tape():
+    handler.validate_tape(pd.read_csv(DEMO_TAPE))
+
+
+def test_validate_tape_names_the_missing_columns():
+    df = pd.read_csv(DEMO_TAPE).drop(columns=["days_past_due", "ltv_band"])
+    with pytest.raises(handler.TapeValidationError, match="days_past_due, ltv_band"):
+        handler.validate_tape(df)
+
+
+def test_validate_tape_rejects_an_empty_file():
+    with pytest.raises(handler.TapeValidationError, match="no rows"):
+        handler.validate_tape(pd.read_csv(DEMO_TAPE).iloc[0:0])
+
+
+def test_validation_error_is_not_a_transient_failure():
+    # Step Functions retries only Lambda service errors; an app error must surface immediately.
+    assert issubclass(handler.TapeValidationError, ValueError)

@@ -2,8 +2,8 @@
 Ingest Pipeline Lambda
 =======================
 Triggered by Step Functions after a new loan tape lands in S3. Scores 100%
-of the uploaded portfolio (vs. the ~5% manual sample review that's standard
-in the industry) across 5 LightGBM targets, the hybrid anomaly/exception
+of the uploaded portfolio (manual review typically covers only a sample)
+across 5 LightGBM targets, the hybrid anomaly/exception
 model, and the deterministic rule engine — then writes one item per loan
 to DynamoDB so the dashboard updates without a page reload.
 """
@@ -37,6 +37,28 @@ s3 = boto3.client("s3")
 dynamodb = boto3.resource("dynamodb")
 
 _MODEL_CACHE = {}
+
+# Raw monthly-performance columns the feature engineering and rule engine read.
+REQUIRED_COLUMNS = [
+    "loan_id", "month_index", "reporting_month", "origination_month", "current_status", "days_past_due",
+    "current_balance", "original_balance", "interest_rate", "credit_score_band", "ltv_band", "dti_band",
+    "loan_age_months", "remaining_term_months", "modification_flag",
+]
+
+
+class TapeValidationError(ValueError):
+    """The uploaded file is not a loan tape this pipeline can score."""
+
+
+def validate_tape(df: pd.DataFrame) -> None:
+    if df.empty:
+        raise TapeValidationError("The uploaded file has no rows.")
+    missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
+    if missing:
+        raise TapeValidationError(
+            f"Missing required columns: {', '.join(missing)}. "
+            "Expected a monthly loan-performance tape; see data/sample/demo_loan_tape.csv for the format."
+        )
 
 
 def _load(name: str):
@@ -225,6 +247,7 @@ def handler(event, context):
         log.info(f"Scoring loan tape s3://{bucket}/{key} (run_id={run_id})")
         obj = s3.get_object(Bucket=bucket, Key=key)
         df = pd.read_csv(io.BytesIO(obj["Body"].read()))
+        validate_tape(df)
         log.info(f"Loaded {len(df):,} rows across {df['loan_id'].nunique():,} loans")
 
         scored = score_loan_tape(df)
