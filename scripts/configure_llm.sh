@@ -36,7 +36,9 @@ esac
 BASE="${BASE%/}"
 
 read -r -s -p "$PROVIDER API key (input hidden): " KEY; echo
+KEY="${KEY//[[:space:]]/}"  # a paste often carries a stray space or newline
 [ -n "$KEY" ] || die "no key entered"
+echo "Read a key of ${#KEY} characters."
 
 echo "Checking the key against $BASE ..."
 MODELS_JSON="$(curl -sS --fail --max-time 30 -A "$UA" -H "Authorization: Bearer $KEY" "$BASE/models")" \
