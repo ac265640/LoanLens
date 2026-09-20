@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend tests (pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/ingest_pipeline/requirements.txt
+      - name: Install
+        run: pip install -r backend/ingest_pipeline/requirements.txt boto3 pytest
+      - name: Test
+        run: python -m pytest tests -q
+
+  cedar:
+    name: Cedar policy tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/cedar_gate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/cedar_gate/package-lock.json
+      - run: npm ci --omit=dev
+      - run: node test_policies.mjs
+
+  frontend:
+    name: Frontend type-check and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  infra:
+    name: SAM template lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install aws-sam-cli
+      - run: sam validate --lint --template infra/template.yaml
+        env:
+          AWS_DEFAULT_REGION: us-east-1
