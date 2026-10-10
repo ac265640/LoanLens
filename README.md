@@ -9,8 +9,17 @@ and prepayment risk, flags records that contradict themselves, stress-tests the 
 policy-as-code. It runs entirely on serverless AWS and was built for the WeMakeDevs x AWS *First Commit* hackathon.
 
 - **Live app:** https://main.d3uibhd8oe3ebl.amplifyapp.com (landing page; the dashboard is at `/dashboard`)
-- **Demo video:** https://youtu.be/FdAweAtTIJ8
+- **Demo video:** [41-second tour](https://ac265640.github.io/LoanLens/) (plays in the browser) · [full walkthrough](https://youtu.be/FdAweAtTIJ8) (YouTube)
 - **Blog:** [Scoring Every Loan, Not a Sample: A Serverless Loan Risk Platform on AWS](https://builder.aws.com/content/3JawUHc9oA7BX5qNSjXqyWVEe2B/scoring-every-loan-not-a-sample-a-serverless-loan-risk-platform-on-aws) (AWS Builder Center)
+
+## Demo
+
+[![LoanLens demo video: click to watch](https://ac265640.github.io/LoanLens/demo/poster.jpg)](https://ac265640.github.io/LoanLens/)
+
+A 41-second tour recorded on the live app, with sound. In order: the 395-loan portfolio, a 41%-risk loan's four probabilities and
+top risk drivers, the Cedar gate denying a Junior Underwriter and allowing a Senior, a credit committee memo, the coverage check
+(a 5% sample would expect to catch 0.3 of the 6 problem loans; LoanLens flags all 6), the rate and unemployment stress sliders, and
+the copilot answering from the scored data. The memo wait is sped up and labelled on screen.
 
 ## The problem
 
